@@ -1,0 +1,6 @@
+{
+  "name": "Informe de Recreación y Deportes",
+  "description": "Informe trimestral comparativo de ingresos y cobertura para el área de Recreación y Deportes de Comfamiliar Risaralda.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background-color: #f8fafc; /* bg-slate-50 */
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Print Styles */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0.8cm 1cm;
+  }
+  .no-print {
+    display: none !important;
+  }
+  html, body, #root {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Main content wrapper: scale uniformly to fit width */
+  main {
+    overflow: visible !important;
+    height: auto !important;
+    zoom: 0.72;
+  }
+  /* Ensure SVGs (charts) are fully visible */
+  svg {
+    overflow: visible !important;
+  }
+  /* Only avoid breaking inside chart SVGs themselves */
+  .recharts-wrapper {
+    break-inside: avoid;
+  }
+  /* Restore table to auto layout - let scale handle sizing */
+  table {
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+}
