@@ -5,7 +5,6 @@ import MetricCards from './components/MetricCards';
 import RevenuesModule from './components/RevenuesModule';
 import ModalitiesTableModule from './components/ModalitiesTableModule';
 import CoverageModule from './components/CoverageModule';
-import SettingsPanel from './components/SettingsPanel';
 
 import {
   DEFAULT_LINE_ALLOCATION,
