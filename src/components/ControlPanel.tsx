@@ -2,18 +2,24 @@ import React from 'react';
 import { Calendar, Filter, MapPin } from 'lucide-react';
 import { MUNICIPALITIES } from '../data';
 
+import { CoverageSource } from '../types';
+
 interface ControlPanelProps {
   periodOption: 'jan_may' | 'jan_jun';
   setPeriodOption: (val: 'jan_may' | 'jan_jun') => void;
   selectedMunicipality: string;
   setSelectedMunicipality: (val: string) => void;
+  coverageSource: CoverageSource;
+  setCoverageSource: (val: CoverageSource) => void;
 }
 
 export default function ControlPanel({
   periodOption,
   setPeriodOption,
   selectedMunicipality,
-  setSelectedMunicipality
+  setSelectedMunicipality,
+  coverageSource,
+  setCoverageSource
 }: ControlPanelProps) {
   return (
     <div className="space-y-4">
@@ -74,6 +80,36 @@ export default function ControlPanel({
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Coverage Source Selector */}
+        <div className="space-y-1.5 pt-2 border-t border-slate-200/50">
+          <label className="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+            <Filter className="h-3.5 w-3.5 text-slate-400" />
+            Fuente de Cobertura
+          </label>
+          <div className="flex flex-col gap-1 rounded-lg border border-slate-200 p-1 bg-white">
+            <button
+              onClick={() => setCoverageSource('servicios_facturados')}
+              className={`w-full rounded-md px-2.5 py-1.5 text-left text-xs font-semibold transition-all cursor-pointer ${
+                coverageSource === 'servicios_facturados'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              Servicios Facturados
+            </button>
+            <button
+              onClick={() => setCoverageSource('informacion_super')}
+              className={`w-full rounded-md px-2.5 py-1.5 text-left text-xs font-semibold transition-all cursor-pointer ${
+                coverageSource === 'informacion_super'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              Información Súper
+            </button>
+          </div>
         </div>
       </div>
     </div>

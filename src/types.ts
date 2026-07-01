@@ -46,3 +46,5 @@ export interface ProgramModality {
   share2025: number; // share of the line's income
   share2026: number; // share of the line's income
 }
+
+export type CoverageSource = 'servicios_facturados' | 'informacion_super';

@@ -1,0 +1,42 @@
+{
+  "2026": {
+    "servicios_facturados": {
+      "total": 37718,
+      "allocations": {
+        "A": 55,
+        "B": 29,
+        "C": 6,
+        "D": 11
+      }
+    },
+    "informacion_super": {
+      "total": 19214,
+      "allocations": {
+        "A": 33,
+        "B": 50,
+        "C": 7,
+        "D": 11
+      }
+    }
+  },
+  "2025": {
+    "servicios_facturados": {
+      "total": 28450,
+      "allocations": {
+        "A": 45,
+        "B": 30,
+        "C": 15,
+        "D": 10
+      }
+    },
+    "informacion_super": {
+      "total": 28450,
+      "allocations": {
+        "A": 45,
+        "B": 30,
+        "C": 15,
+        "D": 10
+      }
+    }
+  }
+}

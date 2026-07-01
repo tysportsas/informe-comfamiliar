@@ -9,57 +9,41 @@ import CoverageModule from './components/CoverageModule';
 import {
   DEFAULT_LINE_ALLOCATION,
   DEFAULT_MODALITIES,
-  DEFAULT_COVERAGE_ALLOCATION_2025,
-  DEFAULT_COVERAGE_ALLOCATION_2026,
-  DEFAULT_COVERAGE_TOTALS,
   MONTHS
 } from './data';
-import { LineAllocation, ProgramModality, CoverageAllocation } from './types';
+import { LineAllocation, ProgramModality, CoverageSource } from './types';
 
 // Load our pre-extracted high-fidelity JSON data directly!
 import reportData from './data/report_data.json';
+import coverageDataRaw from './data/coverage_data.json';
+
+// Type assertion for coverageData
+const coverageData = coverageDataRaw as any;
 
 export default function App() {
   // --- States ---
   const [periodOption, setPeriodOption] = useState<'jan_may' | 'jan_jun'>('jan_may');
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('ALL');
+  const [coverageSource, setCoverageSource] = useState<CoverageSource>('servicios_facturados');
 
   const [lineAllocation, setLineAllocation] = useState<LineAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_line_allocation_v3');
+    const saved = localStorage.getItem('comfamiliar_line_allocation_v4');
     return saved ? JSON.parse(saved) : DEFAULT_LINE_ALLOCATION;
   });
 
   const [modalities, setModalities] = useState<ProgramModality[]>(() => {
-    const saved = localStorage.getItem('comfamiliar_modalities_v3');
+    const saved = localStorage.getItem('comfamiliar_modalities_v4');
     return saved ? JSON.parse(saved) : DEFAULT_MODALITIES;
-  });
-
-  const [coverageAllocation2025, setCoverageAllocation2025] = useState<CoverageAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_cov_alloc_2025_v3');
-    return saved ? JSON.parse(saved) : DEFAULT_COVERAGE_ALLOCATION_2025;
-  });
-
-  const [coverageAllocation2026, setCoverageAllocation2026] = useState<CoverageAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_cov_alloc_2026_v3');
-    return saved ? JSON.parse(saved) : DEFAULT_COVERAGE_ALLOCATION_2026;
   });
 
   // --- Sync storage ---
   useEffect(() => {
-    localStorage.setItem('comfamiliar_line_allocation_v3', JSON.stringify(lineAllocation));
+    localStorage.setItem('comfamiliar_line_allocation_v4', JSON.stringify(lineAllocation));
   }, [lineAllocation]);
 
   useEffect(() => {
-    localStorage.setItem('comfamiliar_modalities_v3', JSON.stringify(modalities));
+    localStorage.setItem('comfamiliar_modalities_v4', JSON.stringify(modalities));
   }, [modalities]);
-
-  useEffect(() => {
-    localStorage.setItem('comfamiliar_cov_alloc_2025_v3', JSON.stringify(coverageAllocation2025));
-  }, [coverageAllocation2025]);
-
-  useEffect(() => {
-    localStorage.setItem('comfamiliar_cov_alloc_2026_v3', JSON.stringify(coverageAllocation2026));
-  }, [coverageAllocation2026]);
 
 
   // --- Calculations ---
@@ -88,9 +72,9 @@ export default function App() {
   const totalIncome2025 = calculateTotalIncome(data2025);
   const totalIncome2026 = calculateTotalIncome(data2026);
 
-  // Dynamic Base Coverage total based on selected municipality
-  const getBaseCoverage = (year: 2025 | 2026) => {
-    let base = year === 2025 ? DEFAULT_COVERAGE_TOTALS[2025] : DEFAULT_COVERAGE_TOTALS[2026];
+  // Dynamic Base Coverage total based on selected municipality and coverageSource
+  const getBaseCoverage = (year: '2025' | '2026') => {
+    let base = coverageData[year][coverageSource].total;
     if (selectedMunicipality === 'PEREIRA') return Math.round(base * 0.60);
     if (selectedMunicipality === 'DOSQUEBRADAS') return Math.round(base * 0.25);
     if (selectedMunicipality === 'SANTA ROSA') return Math.round(base * 0.10);
@@ -98,8 +82,8 @@ export default function App() {
     return base;
   };
 
-  const coverageTotal2025 = getBaseCoverage(2025);
-  const coverageTotal2026 = getBaseCoverage(2026);
+  const coverageTotal2025 = getBaseCoverage('2025');
+  const coverageTotal2026 = getBaseCoverage('2026');
 
   // Split Line totals for modality formulas
   const getLineTotals = (yearData: any) => {
@@ -168,10 +152,12 @@ export default function App() {
     });
 
     // 4. Beneficiary Coverage
-    csvContent += `Cobertura Beneficiarios;Categoría A;Cat. A;${selectedMunicipality};${Math.round(coverageTotal2025 * (coverageAllocation2025.A / 100))};${Math.round(coverageTotal2026 * (coverageAllocation2026.A / 100))}\n`;
-    csvContent += `Cobertura Beneficiarios;Categoría B;Cat. B;${selectedMunicipality};${Math.round(coverageTotal2025 * (coverageAllocation2025.B / 100))};${Math.round(coverageTotal2026 * (coverageAllocation2026.B / 100))}\n`;
-    csvContent += `Cobertura Beneficiarios;Categoría C;Cat. C;${selectedMunicipality};${Math.round(coverageTotal2025 * (coverageAllocation2025.C / 100))};${Math.round(coverageTotal2026 * (coverageAllocation2026.C / 100))}\n`;
-    csvContent += `Cobertura Beneficiarios;Categoría D;Cat. D;${selectedMunicipality};${Math.round(coverageTotal2025 * (coverageAllocation2025.D / 100))};${Math.round(coverageTotal2026 * (coverageAllocation2026.D / 100))}\n`;
+    const alloc25 = coverageData['2025'][coverageSource].allocations;
+    const alloc26 = coverageData['2026'][coverageSource].allocations;
+    csvContent += `Cobertura Beneficiarios;Categoría A;Cat. A;${selectedMunicipality};${Math.round(coverageTotal2025 * (alloc25.A / 100))};${Math.round(coverageTotal2026 * (alloc26.A / 100))}\n`;
+    csvContent += `Cobertura Beneficiarios;Categoría B;Cat. B;${selectedMunicipality};${Math.round(coverageTotal2025 * (alloc25.B / 100))};${Math.round(coverageTotal2026 * (alloc26.B / 100))}\n`;
+    csvContent += `Cobertura Beneficiarios;Categoría C;Cat. C;${selectedMunicipality};${Math.round(coverageTotal2025 * (alloc25.C / 100))};${Math.round(coverageTotal2026 * (alloc26.C / 100))}\n`;
+    csvContent += `Cobertura Beneficiarios;Categoría D;Cat. D;${selectedMunicipality};${Math.round(coverageTotal2025 * (alloc25.D / 100))};${Math.round(coverageTotal2026 * (alloc26.D / 100))}\n`;
 
     // Trigger download
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -211,6 +197,8 @@ export default function App() {
             setPeriodOption={setPeriodOption}
             selectedMunicipality={selectedMunicipality}
             setSelectedMunicipality={setSelectedMunicipality}
+            coverageSource={coverageSource}
+            setCoverageSource={setCoverageSource}
           />
         </div>
 
@@ -270,6 +258,7 @@ export default function App() {
           {/* Section 6: Coverage (Real Data 2026) */}
           <CoverageModule
             selectedMunicipality={selectedMunicipality}
+            coverageSource={coverageSource}
           />
 
           {/* Footer */}
