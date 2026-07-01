@@ -25,40 +25,40 @@ export default function App() {
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('ALL');
 
   const [lineAllocation, setLineAllocation] = useState<LineAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_line_allocation_v2');
+    const saved = localStorage.getItem('comfamiliar_line_allocation_v3');
     return saved ? JSON.parse(saved) : DEFAULT_LINE_ALLOCATION;
   });
 
   const [modalities, setModalities] = useState<ProgramModality[]>(() => {
-    const saved = localStorage.getItem('comfamiliar_modalities_v2');
+    const saved = localStorage.getItem('comfamiliar_modalities_v3');
     return saved ? JSON.parse(saved) : DEFAULT_MODALITIES;
   });
 
   const [coverageAllocation2025, setCoverageAllocation2025] = useState<CoverageAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_cov_alloc_2025_v2');
+    const saved = localStorage.getItem('comfamiliar_cov_alloc_2025_v3');
     return saved ? JSON.parse(saved) : DEFAULT_COVERAGE_ALLOCATION_2025;
   });
 
   const [coverageAllocation2026, setCoverageAllocation2026] = useState<CoverageAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_cov_alloc_2026_v2');
+    const saved = localStorage.getItem('comfamiliar_cov_alloc_2026_v3');
     return saved ? JSON.parse(saved) : DEFAULT_COVERAGE_ALLOCATION_2026;
   });
 
   // --- Sync storage ---
   useEffect(() => {
-    localStorage.setItem('comfamiliar_line_allocation_v2', JSON.stringify(lineAllocation));
+    localStorage.setItem('comfamiliar_line_allocation_v3', JSON.stringify(lineAllocation));
   }, [lineAllocation]);
 
   useEffect(() => {
-    localStorage.setItem('comfamiliar_modalities_v2', JSON.stringify(modalities));
+    localStorage.setItem('comfamiliar_modalities_v3', JSON.stringify(modalities));
   }, [modalities]);
 
   useEffect(() => {
-    localStorage.setItem('comfamiliar_cov_alloc_2025_v2', JSON.stringify(coverageAllocation2025));
+    localStorage.setItem('comfamiliar_cov_alloc_2025_v3', JSON.stringify(coverageAllocation2025));
   }, [coverageAllocation2025]);
 
   useEffect(() => {
-    localStorage.setItem('comfamiliar_cov_alloc_2026_v2', JSON.stringify(coverageAllocation2026));
+    localStorage.setItem('comfamiliar_cov_alloc_2026_v3', JSON.stringify(coverageAllocation2026));
   }, [coverageAllocation2026]);
 
 
