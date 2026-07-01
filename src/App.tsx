@@ -61,19 +61,6 @@ export default function App() {
     localStorage.setItem('comfamiliar_cov_alloc_2026', JSON.stringify(coverageAllocation2026));
   }, [coverageAllocation2026]);
 
-  // --- Reset All Parameters to Default ---
-  const handleResetAll = () => {
-    if (window.confirm('¿Está seguro de restaurar todas las distribuciones y parámetros por defecto?')) {
-      setLineAllocation(DEFAULT_LINE_ALLOCATION);
-      setModalities(DEFAULT_MODALITIES);
-      setCoverageAllocation2025(DEFAULT_COVERAGE_ALLOCATION_2025);
-      setCoverageAllocation2026(DEFAULT_COVERAGE_ALLOCATION_2026);
-      localStorage.removeItem('comfamiliar_line_allocation');
-      localStorage.removeItem('comfamiliar_modalities');
-      localStorage.removeItem('comfamiliar_cov_alloc_2025');
-      localStorage.removeItem('comfamiliar_cov_alloc_2026');
-    }
-  };
 
   // --- Calculations ---
   const monthsLimit = periodOption === 'jan_may' ? 5 : 6;
@@ -225,13 +212,6 @@ export default function App() {
             selectedMunicipality={selectedMunicipality}
             setSelectedMunicipality={setSelectedMunicipality}
           />
-
-          {/* Section 4: Revenue Partitions Config (Settings) */}
-          <SettingsPanel
-            lineAllocation={lineAllocation}
-            onUpdateLineAllocation={setLineAllocation}
-            onReset={() => setLineAllocation(DEFAULT_LINE_ALLOCATION)}
-          />
         </div>
 
         <div className="p-4 text-[10px] text-slate-400 border-t border-slate-100 bg-slate-50/20 flex justify-between items-center font-mono">
@@ -247,7 +227,7 @@ export default function App() {
       <div className="flex-1 flex flex-col print:h-auto print:overflow-visible print:block min-w-0">
         
         {/* Header Panel */}
-        <Header onReset={handleResetAll} selectedPeriod={periodLabel} onDownloadCSV={handleDownloadCSV} />
+        <Header selectedPeriod={periodLabel} onDownloadCSV={handleDownloadCSV} />
 
         {/* Content View */}
         <main className="flex-1 p-6 md:p-8 space-y-6 overflow-y-auto print:h-auto print:overflow-visible print:block">

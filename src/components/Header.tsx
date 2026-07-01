@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { Activity, Printer, RotateCcw, Download, Loader2 } from 'lucide-react';
+import { Activity, Printer, Download, Loader2 } from 'lucide-react';
 import { exportDashboardToWord } from '../utils/wordExport';
 
 interface HeaderProps {
-  onReset: () => void;
   selectedPeriod: string;
   onDownloadCSV: () => void;
 }
 
-export default function Header({ onReset, selectedPeriod, onDownloadCSV }: HeaderProps) {
+export default function Header({ selectedPeriod, onDownloadCSV }: HeaderProps) {
   const [isExportingWord, setIsExportingWord] = useState(false);
 
   const handlePrint = () => {
@@ -38,14 +37,6 @@ export default function Header({ onReset, selectedPeriod, onDownloadCSV }: Heade
       </div>
 
       <div className="flex items-center gap-2 min-w-max">
-        <button
-          onClick={onReset}
-          className="px-3 py-1.5 border border-slate-200 text-xs font-semibold text-slate-600 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1.5 cursor-pointer"
-          title="Restaurar parámetros por defecto"
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Restaurar</span>
-        </button>
         <button
           onClick={onDownloadCSV}
           className="px-3 py-1.5 border border-slate-200 text-xs font-semibold text-slate-600 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1.5 cursor-pointer"
