@@ -1,24 +1,53 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { usePrintMode } from '../hooks/usePrintMode';
-import modalitiesData from '../data/modalities_trend.json';
+import { supabase } from '../lib/supabase';
+import { Loader2 } from 'lucide-react';
 
 interface ModalitiesTableModuleProps {
   selectedMunicipality: string;
 }
 
 export default function ModalitiesTableModule({ selectedMunicipality }: ModalitiesTableModuleProps) {
-  // Manejo de la sede seleccionada en el filtro local, por defecto la global
   const availableSedes = ['Todas', 'Pereira', 'Dosquebradas', 'Santa Rosa', 'Quinchía'];
   
   const [sedeFilter, setSedeFilter] = useState<string>(
     selectedMunicipality === 'ALL' ? 'Todas' : selectedMunicipality
   );
 
+  const [modalitiesData, setModalitiesData] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchModalities = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase.from('modalities_trend').select('*');
+      
+      if (!error && data) {
+        // Transform into nested object { Linea: { Sede: { Modality: { Enero, Febrero... } } } }
+        const formattedData: any = {};
+        data.forEach((row) => {
+          if (!formattedData[row.linea]) formattedData[row.linea] = {};
+          if (!formattedData[row.linea][row.sede]) formattedData[row.linea][row.sede] = {};
+          formattedData[row.linea][row.sede][row.modality] = {
+            Enero: row.enero,
+            Febrero: row.febrero,
+            Marzo: row.marzo,
+            Abril: row.abril,
+            Mayo: row.mayo
+          };
+        });
+        setModalitiesData(formattedData);
+      }
+      setIsLoading(false);
+    };
+
+    fetchModalities();
+  }, []);
+
   // Helper para extraer la data según la sede filtrada
   const getTableData = (linea: 'Deporte' | 'Recreación') => {
     let rawData: Record<string, { Enero: number; Febrero: number; Marzo: number; Abril: number; Mayo: number }> = {};
     
-    // @ts-ignore
     const lineaData = modalitiesData[linea] || {};
 
     if (sedeFilter === 'Todas') {
@@ -62,8 +91,17 @@ export default function ModalitiesTableModule({ selectedMunicipality }: Modaliti
     return rows.sort((a, b) => b.total - a.total);
   };
 
-  const deportesData = useMemo(() => getTableData('Deporte'), [sedeFilter]);
-  const talleresData = useMemo(() => getTableData('Recreación'), [sedeFilter]);
+  const deportesData = useMemo(() => getTableData('Deporte'), [sedeFilter, modalitiesData]);
+  const talleresData = useMemo(() => getTableData('Recreación'), [sedeFilter, modalitiesData]);
+
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-12 shadow-sm mb-6 flex flex-col items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mb-4" />
+        <p className="text-slate-500 font-medium">Cargando base de datos...</p>
+      </div>
+    );
+  }
 
   const renderTable = (title: string, data: any[]) => {
     if (data.length === 0) {

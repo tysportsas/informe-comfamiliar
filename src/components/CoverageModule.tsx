@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Users, TrendingUp } from 'lucide-react';
-import categoriesData from '../data/categories_trend.json';
+import { Users, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 interface CoverageModuleProps {
   selectedMunicipality: string;
@@ -13,14 +13,41 @@ export default function CoverageModule({ selectedMunicipality }: CoverageModuleP
   const [sedeFilter, setSedeFilter] = useState<string>(
     selectedMunicipality === 'ALL' ? 'Todas' : selectedMunicipality
   );
+  
+  const [categoriesData, setCategoriesData] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase.from('categories_trend').select('*');
+      
+      if (!error && data) {
+        // Transform array into nested object { Sede: { Month: { A, B, C, D } } }
+        const formattedData: any = {};
+        data.forEach((row) => {
+          if (!formattedData[row.sede]) formattedData[row.sede] = {};
+          formattedData[row.sede][row.month] = {
+            A: row.cat_a,
+            B: row.cat_b,
+            C: row.cat_c,
+            D: row.cat_d
+          };
+        });
+        setCategoriesData(formattedData);
+      }
+      setIsLoading(false);
+    };
+
+    fetchCategories();
+  }, []);
 
   const formatInt = (val: number) => {
     return new Intl.NumberFormat('es-CO').format(val);
   };
 
   const chartData = useMemo(() => {
-    // @ts-ignore
-    const dataForSede = categoriesData[sedeFilter] || categoriesData['Todas'];
+    const dataForSede = categoriesData[sedeFilter] || categoriesData['Todas'] || {};
     
     // Convert to array for Recharts
     const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'];
@@ -31,7 +58,7 @@ export default function CoverageModule({ selectedMunicipality }: CoverageModuleP
       C: dataForSede[m]?.C || 0,
       D: dataForSede[m]?.D || 0,
     }));
-  }, [sedeFilter]);
+  }, [sedeFilter, categoriesData]);
 
   // Calculate totals for quick metrics
   const totals = useMemo(() => {
@@ -44,6 +71,15 @@ export default function CoverageModule({ selectedMunicipality }: CoverageModuleP
   }, [chartData]);
 
   const totalUsers = totals.A + totals.B + totals.C + totals.D;
+
+  if (isLoading) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-12 shadow-sm mb-6 flex flex-col items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mb-4" />
+        <p className="text-slate-500 font-medium">Cargando base de datos...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mb-6">

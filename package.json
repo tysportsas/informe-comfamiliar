@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
+    "@supabase/supabase-js": "^2.110.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
-    "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "file-saver": "^2.0.5",
     "html-docx-js-typescript": "^0.1.5",
@@ -34,6 +34,7 @@
     "@types/html-docx-js": "^0.3.4",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
+    "dotenv": "^17.4.2",
     "esbuild": "^0.25.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
