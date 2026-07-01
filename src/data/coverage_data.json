@@ -2,6 +2,7 @@
   "2026": {
     "servicios_facturados": {
       "total": 37718,
+      "monthly": [ 5703, 7738, 7821, 7910, 8546, 0 ],
       "allocations": {
         "A": 55,
         "B": 29,
@@ -11,6 +12,7 @@
     },
     "informacion_super": {
       "total": 19214,
+      "monthly": [ 3064, 3992, 4014, 3991, 4153, 0 ],
       "allocations": {
         "A": 33,
         "B": 50,

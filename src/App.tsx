@@ -74,7 +74,14 @@ export default function App() {
 
   // Dynamic Base Coverage total based on selected municipality and coverageSource
   const getBaseCoverage = (year: '2025' | '2026') => {
-    let base = coverageData[year][coverageSource].total;
+    const coverageYearData = coverageData[year][coverageSource];
+    let base = coverageYearData.total;
+    
+    // If month-by-month data exists, sum up to monthsLimit
+    if (coverageYearData.monthly && Array.isArray(coverageYearData.monthly)) {
+      base = coverageYearData.monthly.slice(0, monthsLimit).reduce((acc: number, curr: number) => acc + curr, 0);
+    }
+    
     if (selectedMunicipality === 'PEREIRA') return Math.round(base * 0.60);
     if (selectedMunicipality === 'DOSQUEBRADAS') return Math.round(base * 0.25);
     if (selectedMunicipality === 'SANTA ROSA') return Math.round(base * 0.10);

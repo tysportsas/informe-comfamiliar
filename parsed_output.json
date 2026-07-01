@@ -1,0 +1,20 @@
+{
+  "servicios_facturados": {
+    "total": 37718,
+    "percentages": {
+      "A": 55,
+      "B": 29,
+      "C": 6,
+      "D": 11
+    }
+  },
+  "informacion_super": {
+    "total": 19214,
+    "percentages": {
+      "A": 33,
+      "B": 50,
+      "C": 7,
+      "D": 11
+    }
+  }
+}

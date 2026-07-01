@@ -112,14 +112,12 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
         </div>
       </div>
 
-      {coverageSource === 'informacion_super' && (
-        <div className="mb-6 rounded-xl bg-amber-50/70 border border-amber-200 p-4 text-sm text-amber-800">
-          <p className="font-semibold mb-1">Aviso sobre Información Súper</p>
-          <p className="text-amber-700 text-xs">
-            La base de datos mensual en tiempo real aún no cuenta con el desglose de Información Súper. Las gráficas inferiores mostrarán la proporción mensual de Servicios Facturados hasta que se habilite el módulo en la base de datos central.
-          </p>
-        </div>
-      )}
+      <div className={`mb-6 rounded-xl bg-amber-50/70 border border-amber-200 p-4 text-sm text-amber-800 transition-all ${coverageSource === 'informacion_super' ? 'block' : 'hidden'}`}>
+        <p className="font-semibold mb-1">Aviso sobre Información Súper</p>
+        <p className="text-amber-700 text-xs">
+          La base de datos mensual en tiempo real aún no cuenta con el desglose de Información Súper. Las gráficas inferiores mostrarán la proporción mensual de Servicios Facturados hasta que se habilite el módulo en la base de datos central.
+        </p>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
