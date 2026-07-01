@@ -38,16 +38,16 @@ export const DEFAULT_COVERAGE_ALLOCATION_2025: CoverageAllocation = {
 };
 
 export const DEFAULT_COVERAGE_ALLOCATION_2026: CoverageAllocation = {
-  A: 47,
-  B: 29,
-  C: 15,
-  D: 9
+  A: 55, // 54.9% rounded
+  B: 28, // 28.5% rounded down to fit 100
+  C: 6,  // 5.8% rounded
+  D: 11  // 10.8% rounded
 };
 
 // Default annual target beneficiaries (Cobertura)
 export const DEFAULT_COVERAGE_TOTALS = {
   2025: 28450, // total beneficiaries
-  2026: 31200  // total beneficiaries (to date)
+  2026: 31145  // real total beneficiaries (Jan-May)
 };
 
 export const MONTHS = [

@@ -11,6 +11,7 @@ import {
   DEFAULT_MODALITIES,
   DEFAULT_COVERAGE_ALLOCATION_2025,
   DEFAULT_COVERAGE_ALLOCATION_2026,
+  DEFAULT_COVERAGE_TOTALS,
   MONTHS
 } from './data';
 import { LineAllocation, ProgramModality, CoverageAllocation } from './types';
@@ -24,40 +25,40 @@ export default function App() {
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('ALL');
 
   const [lineAllocation, setLineAllocation] = useState<LineAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_line_allocation');
+    const saved = localStorage.getItem('comfamiliar_line_allocation_v2');
     return saved ? JSON.parse(saved) : DEFAULT_LINE_ALLOCATION;
   });
 
   const [modalities, setModalities] = useState<ProgramModality[]>(() => {
-    const saved = localStorage.getItem('comfamiliar_modalities');
+    const saved = localStorage.getItem('comfamiliar_modalities_v2');
     return saved ? JSON.parse(saved) : DEFAULT_MODALITIES;
   });
 
   const [coverageAllocation2025, setCoverageAllocation2025] = useState<CoverageAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_cov_alloc_2025');
+    const saved = localStorage.getItem('comfamiliar_cov_alloc_2025_v2');
     return saved ? JSON.parse(saved) : DEFAULT_COVERAGE_ALLOCATION_2025;
   });
 
   const [coverageAllocation2026, setCoverageAllocation2026] = useState<CoverageAllocation>(() => {
-    const saved = localStorage.getItem('comfamiliar_cov_alloc_2026');
+    const saved = localStorage.getItem('comfamiliar_cov_alloc_2026_v2');
     return saved ? JSON.parse(saved) : DEFAULT_COVERAGE_ALLOCATION_2026;
   });
 
   // --- Sync storage ---
   useEffect(() => {
-    localStorage.setItem('comfamiliar_line_allocation', JSON.stringify(lineAllocation));
+    localStorage.setItem('comfamiliar_line_allocation_v2', JSON.stringify(lineAllocation));
   }, [lineAllocation]);
 
   useEffect(() => {
-    localStorage.setItem('comfamiliar_modalities', JSON.stringify(modalities));
+    localStorage.setItem('comfamiliar_modalities_v2', JSON.stringify(modalities));
   }, [modalities]);
 
   useEffect(() => {
-    localStorage.setItem('comfamiliar_cov_alloc_2025', JSON.stringify(coverageAllocation2025));
+    localStorage.setItem('comfamiliar_cov_alloc_2025_v2', JSON.stringify(coverageAllocation2025));
   }, [coverageAllocation2025]);
 
   useEffect(() => {
-    localStorage.setItem('comfamiliar_cov_alloc_2026', JSON.stringify(coverageAllocation2026));
+    localStorage.setItem('comfamiliar_cov_alloc_2026_v2', JSON.stringify(coverageAllocation2026));
   }, [coverageAllocation2026]);
 
 
@@ -89,7 +90,7 @@ export default function App() {
 
   // Dynamic Base Coverage total based on selected municipality
   const getBaseCoverage = (year: 2025 | 2026) => {
-    let base = year === 2025 ? 28450 : 31200;
+    let base = year === 2025 ? DEFAULT_COVERAGE_TOTALS[2025] : DEFAULT_COVERAGE_TOTALS[2026];
     if (selectedMunicipality === 'PEREIRA') return Math.round(base * 0.60);
     if (selectedMunicipality === 'DOSQUEBRADAS') return Math.round(base * 0.25);
     if (selectedMunicipality === 'SANTA ROSA') return Math.round(base * 0.10);
