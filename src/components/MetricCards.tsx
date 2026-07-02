@@ -76,8 +76,8 @@ export default function MetricCards({
               <span className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-2xs font-bold ${
                 isIncomeUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
               }`}>
-                {isIncomeUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                {pctIncome.toFixed(1)}%
+                <span>{isIncomeUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}</span>
+                <span>{pctIncome.toFixed(1)}%</span>
               </span>
               <span className="text-xs text-slate-500 font-medium">vs 2025</span>
             </div>
@@ -102,8 +102,8 @@ export default function MetricCards({
               <span className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-2xs font-bold ${
                 isCoverageUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
               }`}>
-                {isCoverageUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                {pctCoverage.toFixed(1)}%
+                <span>{isCoverageUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}</span>
+                <span>{pctCoverage.toFixed(1)}%</span>
               </span>
               <span className="text-xs text-slate-500 font-medium">Incremento de Cobertura</span>
             </div>
