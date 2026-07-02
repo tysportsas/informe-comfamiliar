@@ -246,6 +246,7 @@ export default function App() {
             coverage2026={coverageTotal2026}
             periodLabel={periodLabel}
             hasIncompleteJune={hasIncompleteJune}
+            showCoverageComparison={coverageSource === 'servicios_facturados'}
           />
 
           {/* Section 3: Revenue Comparative Module (Req 1 & 2) */}

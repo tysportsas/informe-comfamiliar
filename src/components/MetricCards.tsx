@@ -8,6 +8,7 @@ interface MetricCardsProps {
   coverage2026: number;
   periodLabel: string;
   hasIncompleteJune: boolean;
+  showCoverageComparison?: boolean;
 }
 
 export default function MetricCards({
@@ -16,7 +17,8 @@ export default function MetricCards({
   coverage2025,
   coverage2026,
   periodLabel,
-  hasIncompleteJune
+  hasIncompleteJune,
+  showCoverageComparison = true
 }: MetricCardsProps) {
   
   // Format currency
@@ -96,17 +98,28 @@ export default function MetricCards({
           <div className="mt-4">
             <div className="flex items-baseline gap-2">
               <h3 className="font-display text-2xl font-bold text-slate-900">{formatInt(coverage2026)}</h3>
-              <span className="text-xs text-slate-400 font-semibold">vs {formatInt(coverage2025)} (2025)</span>
+              {showCoverageComparison && (
+                <span className="text-xs text-slate-400 font-semibold">vs {formatInt(coverage2025)} (2025)</span>
+              )}
             </div>
-            <div className="mt-1 flex items-center gap-1.5">
-              <span className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-2xs font-bold ${
-                isCoverageUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-              }`}>
-                <span>{isCoverageUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}</span>
-                <span>{pctCoverage.toFixed(1)}%</span>
-              </span>
-              <span className="text-xs text-slate-500 font-medium">Incremento de Cobertura</span>
-            </div>
+            
+            {showCoverageComparison ? (
+              <div className="mt-1 flex items-center gap-1.5">
+                <span className={`inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-2xs font-bold ${
+                  isCoverageUp ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                }`}>
+                  <span>{isCoverageUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}</span>
+                  <span>{pctCoverage.toFixed(1)}%</span>
+                </span>
+                <span className="text-xs text-slate-500 font-medium">Incremento de Cobertura</span>
+              </div>
+            ) : (
+              <div className="mt-1 flex items-center gap-1.5">
+                <span className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-2xs font-bold bg-slate-100 text-slate-500">
+                  Sin histórico 2025
+                </span>
+              </div>
+            )}
           </div>
           <div className="absolute right-0 bottom-0 h-1.5 w-full bg-emerald-500" />
         </div>
