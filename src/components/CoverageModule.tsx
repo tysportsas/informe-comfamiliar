@@ -156,16 +156,16 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
             />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
-            <Bar dataKey="A" name="Cat. A (Subsidio Alto)" stackId="a" fill="#2563eb" radius={[0, 0, 0, 0]}>
+            <Bar dataKey="A" name="Categoría A (Subsidio Alto)" stackId="a" fill="#2563eb" radius={[0, 0, 0, 0]}>
               <LabelList dataKey="A" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
             </Bar>
-            <Bar dataKey="B" name="Cat. B (Subsidio Medio)" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]}>
+            <Bar dataKey="B" name="Categoría B (Subsidio Medio)" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]}>
               <LabelList dataKey="B" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
             </Bar>
-            <Bar dataKey="C" name="Cat. C (No subsidiado)" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]}>
+            <Bar dataKey="C" name="Categoría C (No subsidiado)" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]}>
               <LabelList dataKey="C" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
             </Bar>
-            <Bar dataKey="D" name="Cat. D (Particulares)" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="D" name="Categoría D (Particulares)" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]}>
               <LabelList dataKey="D" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
             </Bar>
           </BarChart>
@@ -182,10 +182,10 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
             <PieChart>
               <Pie
                 data={[
-                  { name: 'Cat. A', value: totals.A },
-                  { name: 'Cat. B', value: totals.B },
-                  { name: 'Cat. C', value: totals.C },
-                  { name: 'Cat. D', value: totals.D },
+                  { name: 'Categoría A', value: totals.A },
+                  { name: 'Categoría B', value: totals.B },
+                  { name: 'Categoría C', value: totals.C },
+                  { name: 'Categoría D', value: totals.D },
                 ]}
                 cx="50%"
                 cy="50%"
