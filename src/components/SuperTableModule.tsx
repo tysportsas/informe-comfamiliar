@@ -38,6 +38,11 @@ export default function SuperTableModule({ monthsList, sedeFilter }: SuperTableM
       uppercaseMonths.forEach(month => {
         const monthRows: SuperRow[] = groupData[month] || [];
         monthRows.forEach(row => {
+          // ONLY INCLUDE Recreación dirigida and Vacaciones recreativas
+          if (row.modality !== 'Recreación dirigida' && row.modality !== 'Vacaciones recreativas') {
+            return;
+          }
+
           if (!result[row.modality]) {
             result[row.modality] = {
               modality: row.modality,
