@@ -4,6 +4,7 @@ import ControlPanel from './components/ControlPanel';
 import MetricCards from './components/MetricCards';
 import RevenuesModule from './components/RevenuesModule';
 import ModalitiesTableModule from './components/ModalitiesTableModule';
+import SuperTableModule from './components/SuperTableModule';
 import CoverageModule from './components/CoverageModule';
 
 import {
@@ -260,8 +261,19 @@ export default function App() {
             />
           </div>
 
-          {/* Modalities Table Comparative Module */}
-          <ModalitiesTableModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
+          {/* Modalities Table Comparative Module or SuperTableModule */}
+          {coverageSource === 'informacion_super' ? (
+            <SuperTableModule 
+              monthsList={MONTHS.slice(0, monthsLimit)} 
+              sedeFilter={
+                selectedMunicipality === 'ALL' ? 'Todas' : 
+                selectedMunicipality === 'PEREIRA' ? 'Todas' : // Super Data doesn't have municipality breakdown, so default to Todas
+                'Todas'
+              } 
+            />
+          ) : (
+            <ModalitiesTableModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
+          )}
 
           {/* Section 6: Coverage (Real Data 2026) */}
           <CoverageModule
