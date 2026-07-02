@@ -1,54 +1,25 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { usePrintMode } from '../hooks/usePrintMode';
-import { supabase } from '../lib/supabase';
-import { Loader2 } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { CoverageSource } from '../types';
+import modalitiesDataRaw from '../data/modalities_data.json';
 
 interface ModalitiesTableModuleProps {
   selectedMunicipality: string;
+  coverageSource?: CoverageSource;
 }
 
-export default function ModalitiesTableModule({ selectedMunicipality }: ModalitiesTableModuleProps) {
+export default function ModalitiesTableModule({ selectedMunicipality, coverageSource = 'servicios_facturados' }: ModalitiesTableModuleProps) {
   const availableSedes = ['Todas', 'Pereira', 'Dosquebradas', 'Santa Rosa', 'Quinchía'];
   
   const [sedeFilter, setSedeFilter] = useState<string>(
     selectedMunicipality === 'ALL' ? 'Todas' : selectedMunicipality
   );
 
-  const [modalitiesData, setModalitiesData] = useState<any>({});
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchModalities = async () => {
-      setIsLoading(true);
-      const { data, error } = await supabase.from('modalities_trend').select('*');
-      
-      if (!error && data) {
-        // Transform into nested object { Linea: { Sede: { Modality: { Enero, Febrero... } } } }
-        const formattedData: any = {};
-        data.forEach((row) => {
-          if (!formattedData[row.linea]) formattedData[row.linea] = {};
-          if (!formattedData[row.linea][row.sede]) formattedData[row.linea][row.sede] = {};
-          formattedData[row.linea][row.sede][row.modality] = {
-            Enero: row.enero,
-            Febrero: row.febrero,
-            Marzo: row.marzo,
-            Abril: row.abril,
-            Mayo: row.mayo
-          };
-        });
-        setModalitiesData(formattedData);
-      }
-      setIsLoading(false);
-    };
-
-    fetchModalities();
-  }, []);
-
-  // Helper para extraer la data según la sede filtrada
+  // Helper para extraer la data según la sede filtrada y la fuente
   const getTableData = (linea: 'Deporte' | 'Recreación') => {
     let rawData: Record<string, { Enero: number; Febrero: number; Marzo: number; Abril: number; Mayo: number }> = {};
     
-    const lineaData = modalitiesData[linea] || {};
+    const sourceData = (modalitiesDataRaw as any)[coverageSource] || {};
+    const lineaData = sourceData[linea] || {};
 
     if (sedeFilter === 'Todas') {
       // Sumar todas las sedes
@@ -68,21 +39,25 @@ export default function ModalitiesTableModule({ selectedMunicipality }: Modaliti
     } else {
       // Filtrar por sede específica
       if (lineaData[sedeFilter]) {
-        rawData = lineaData[sedeFilter];
+        // Hacemos una copia profunda superficial para no mutar el original en caso de
+        // requerir modificaciones extra, pero aqui solo copiamos la referencia
+        Object.keys(lineaData[sedeFilter]).forEach(modality => {
+           rawData[modality] = { ...lineaData[sedeFilter][modality] };
+        });
       }
     }
 
     // Convert to array and add totals
     const rows = Object.keys(rawData).map(modality => {
       const d = rawData[modality];
-      const total = d.Enero + d.Febrero + d.Marzo + d.Abril + d.Mayo;
+      const total = (d.Enero || 0) + (d.Febrero || 0) + (d.Marzo || 0) + (d.Abril || 0) + (d.Mayo || 0);
       return {
         name: modality,
-        enero: d.Enero,
-        febrero: d.Febrero,
-        marzo: d.Marzo,
-        abril: d.Abril,
-        mayo: d.Mayo,
+        enero: d.Enero || 0,
+        febrero: d.Febrero || 0,
+        marzo: d.Marzo || 0,
+        abril: d.Abril || 0,
+        mayo: d.Mayo || 0,
         total
       };
     });
@@ -91,24 +66,19 @@ export default function ModalitiesTableModule({ selectedMunicipality }: Modaliti
     return rows.sort((a, b) => b.total - a.total);
   };
 
-  const deportesData = useMemo(() => getTableData('Deporte'), [sedeFilter, modalitiesData]);
-  const talleresData = useMemo(() => getTableData('Recreación'), [sedeFilter, modalitiesData]);
-
-  if (isLoading) {
-    return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-12 shadow-sm mb-6 flex flex-col items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mb-4" />
-        <p className="text-slate-500 font-medium">Cargando base de datos...</p>
-      </div>
-    );
-  }
+  const deportesData = useMemo(() => getTableData('Deporte'), [sedeFilter, coverageSource]);
+  const talleresData = useMemo(() => getTableData('Recreación'), [sedeFilter, coverageSource]);
 
   const renderTable = (title: string, data: any[]) => {
     if (data.length === 0) {
       return (
         <div className="mb-8">
           <h3 className="text-sm font-semibold text-slate-700 mb-3">{title}</h3>
-          <p className="text-sm text-slate-400 italic">No hay datos reportados para esta sede.</p>
+          <p className="text-sm text-slate-400 italic">
+            {coverageSource === 'informacion_super' && sedeFilter !== 'Todas' 
+              ? 'La Base de Datos de Información Súper no cuenta con desglose por sede para estas modalidades. Selecciona "Todas" en el filtro de sede para ver los totales.' 
+              : 'No hay datos reportados para esta sede.'}
+          </p>
         </div>
       );
     }

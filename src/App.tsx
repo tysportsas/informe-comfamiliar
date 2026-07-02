@@ -261,7 +261,7 @@ export default function App() {
           </div>
 
           {/* Modalities Table Comparative Module */}
-          <ModalitiesTableModule selectedMunicipality={selectedMunicipality} />
+          <ModalitiesTableModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
 
           {/* Section 6: Coverage (Real Data 2026) */}
           <CoverageModule
