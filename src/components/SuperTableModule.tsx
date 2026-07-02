@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import superData from '../data/super_table_data.json';
 
 interface SuperTableModuleProps {
@@ -23,9 +23,12 @@ interface SuperRow {
 }
 
 export default function SuperTableModule({ monthsList, sedeFilter }: SuperTableModuleProps) {
+  const [selectedMonth, setSelectedMonth] = useState<string>('Todos');
   
   const aggregatedData = useMemo(() => {
-    const uppercaseMonths = monthsList.map(m => m.toUpperCase());
+    const uppercaseMonths = selectedMonth === 'Todos' 
+      ? monthsList.map(m => m.toUpperCase())
+      : [selectedMonth.toUpperCase()];
     const result: Record<string, SuperRow> = {};
 
     const groups = sedeFilter === 'Todas' ? ['Deporte', 'Recreación'] : [sedeFilter];
@@ -72,7 +75,7 @@ export default function SuperTableModule({ monthsList, sedeFilter }: SuperTableM
     });
 
     return Object.values(result).sort((a, b) => b.total_per - a.total_per);
-  }, [monthsList, sedeFilter]);
+  }, [monthsList, sedeFilter, selectedMonth]);
 
   const totalRow = useMemo(() => {
     return aggregatedData.reduce((acc, curr) => {
@@ -107,14 +110,31 @@ export default function SuperTableModule({ monthsList, sedeFilter }: SuperTableM
 
   return (
     <div className="mt-8">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-800 font-display">
             Información Súper
           </h2>
           <p className="text-sm text-slate-500">
-            Consolidado por categoría y usos ({monthsList.length === 1 ? monthsList[0] : `Acumulado ${monthsList[0]} - ${monthsList[monthsList.length - 1]}`})
+            Consolidado por categoría y usos ({selectedMonth === 'Todos' ? (monthsList.length === 1 ? monthsList[0] : `Acumulado ${monthsList[0]} - ${monthsList[monthsList.length - 1]}`) : selectedMonth})
           </p>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <label htmlFor="month-select" className="text-sm font-medium text-slate-600">
+            Ver mes:
+          </label>
+          <select
+            id="month-select"
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="rounded-lg border-slate-300 py-1.5 pl-3 pr-8 text-sm focus:border-[#4285F4] focus:ring-[#4285F4]"
+          >
+            <option value="Todos">Acumulado ({monthsList.length} meses)</option>
+            {monthsList.map(month => (
+              <option key={month} value={month}>{month}</option>
+            ))}
+          </select>
         </div>
       </div>
 
