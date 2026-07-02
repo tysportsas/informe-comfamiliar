@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Activity, Printer, Download, Loader2 } from 'lucide-react';
 import { exportDashboardToWord } from '../utils/wordExport';
+import LiveUsers from './LiveUsers';
 
 interface HeaderProps {
   selectedPeriod: string;
@@ -36,7 +37,11 @@ export default function Header({ selectedPeriod, onDownloadCSV }: HeaderProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 min-w-max">
+      <div className="flex items-center gap-4 min-w-max">
+        <LiveUsers />
+        
+        <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
+        
         <button
           onClick={onDownloadCSV}
           className="px-3 py-1.5 border border-slate-200 text-xs font-semibold text-slate-600 rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-1.5 cursor-pointer"
