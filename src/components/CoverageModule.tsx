@@ -157,16 +157,56 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
             />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
             <Bar dataKey="A" name="Categoría A (Subsidio Alto)" stackId="a" fill="#2563eb" radius={[0, 0, 0, 0]}>
-              <LabelList dataKey="A" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+              <LabelList content={(props: any) => {
+                const { x, y, width, height, index } = props;
+                const data = chartData[index];
+                if (!data || data.A === 0) return null;
+                const total = data.A + data.B + data.C + data.D;
+                return (
+                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
+                    {`${formatInt(data.A)} (${((data.A / total) * 100).toFixed(1)}%)`}
+                  </text>
+                );
+              }} />
             </Bar>
             <Bar dataKey="B" name="Categoría B (Subsidio Medio)" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]}>
-              <LabelList dataKey="B" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+              <LabelList content={(props: any) => {
+                const { x, y, width, height, index } = props;
+                const data = chartData[index];
+                if (!data || data.B === 0) return null;
+                const total = data.A + data.B + data.C + data.D;
+                return (
+                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
+                    {`${formatInt(data.B)} (${((data.B / total) * 100).toFixed(1)}%)`}
+                  </text>
+                );
+              }} />
             </Bar>
             <Bar dataKey="C" name="Categoría C (No subsidiado)" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]}>
-              <LabelList dataKey="C" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+              <LabelList content={(props: any) => {
+                const { x, y, width, height, index } = props;
+                const data = chartData[index];
+                if (!data || data.C === 0) return null;
+                const total = data.A + data.B + data.C + data.D;
+                return (
+                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
+                    {`${formatInt(data.C)} (${((data.C / total) * 100).toFixed(1)}%)`}
+                  </text>
+                );
+              }} />
             </Bar>
             <Bar dataKey="D" name="Categoría D (Particulares)" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]}>
-              <LabelList dataKey="D" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+              <LabelList content={(props: any) => {
+                const { x, y, width, height, index } = props;
+                const data = chartData[index];
+                if (!data || data.D === 0) return null;
+                const total = data.A + data.B + data.C + data.D;
+                return (
+                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
+                    {`${formatInt(data.D)} (${((data.D / total) * 100).toFixed(1)}%)`}
+                  </text>
+                );
+              }} />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
