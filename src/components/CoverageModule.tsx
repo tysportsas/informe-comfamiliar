@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Users, Loader2 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Users, Loader2, PieChart as PieChartIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 import { CoverageSource } from '../types';
@@ -156,12 +156,57 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
             />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
-            <Bar dataKey="A" name="Cat. A (Subsidio Alto)" stackId="a" fill="#2563eb" radius={[0, 0, 0, 0]} />
-            <Bar dataKey="B" name="Cat. B (Subsidio Medio)" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-            <Bar dataKey="C" name="Cat. C (No Subsidia)" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]} />
-            <Bar dataKey="D" name="Cat. D (Particular)" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="A" name="Cat. A (Subsidio Alto)" stackId="a" fill="#2563eb" radius={[0, 0, 0, 0]}>
+              <LabelList dataKey="A" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+            </Bar>
+            <Bar dataKey="B" name="Cat. B (Subsidio Medio)" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]}>
+              <LabelList dataKey="B" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+            </Bar>
+            <Bar dataKey="C" name="Cat. C (No subsidiado)" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]}>
+              <LabelList dataKey="C" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+            </Bar>
+            <Bar dataKey="D" name="Cat. D (Particulares)" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]}>
+              <LabelList dataKey="D" position="center" fill="#ffffff" fontSize={11} formatter={(val: number) => val > 0 ? formatInt(val) : ''} />
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
+      </div>
+      
+      <div className="mt-12 mb-4 border-t border-slate-200 pt-8">
+        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
+          <PieChartIcon className="text-indigo-600 h-5 w-5" />
+          Total Usos por Categoría
+        </h3>
+        <div className="h-[350px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={[
+                  { name: 'Cat. A', value: totals.A },
+                  { name: 'Cat. B', value: totals.B },
+                  { name: 'Cat. C', value: totals.C },
+                  { name: 'Cat. D', value: totals.D },
+                ]}
+                cx="50%"
+                cy="50%"
+                innerRadius={80}
+                outerRadius={120}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                <Cell fill="#2563eb" />
+                <Cell fill="#10b981" />
+                <Cell fill="#f59e0b" />
+                <Cell fill="#f43f5e" />
+              </Pie>
+              <Tooltip 
+                formatter={(value: number) => [formatInt(value), 'Usos']}
+                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              />
+              <Legend verticalAlign="bottom" height={36} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
