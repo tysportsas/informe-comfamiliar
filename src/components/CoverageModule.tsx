@@ -189,10 +189,22 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
                 ]}
                 cx="50%"
                 cy="50%"
-                innerRadius={80}
-                outerRadius={120}
+                innerRadius={70}
+                outerRadius={110}
                 paddingAngle={5}
                 dataKey="value"
+                label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, value }) => {
+                  const radius = innerRadius + (outerRadius - innerRadius) * 1.6;
+                  const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
+                  const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
+                  if (value === 0) return null;
+                  return (
+                    <text x={x} y={y} fill="#64748b" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={11} fontWeight={600}>
+                      {`${formatInt(value)} (${(percent * 100).toFixed(1)}%)`}
+                    </text>
+                  );
+                }}
+                labelLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
               >
                 <Cell fill="#2563eb" />
                 <Cell fill="#10b981" />
