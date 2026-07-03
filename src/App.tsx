@@ -4,6 +4,7 @@ import ControlPanel from './components/ControlPanel';
 import MetricCards from './components/MetricCards';
 import RevenuesModule from './components/RevenuesModule';
 import ModalitiesTableModule from './components/ModalitiesTableModule';
+import ComparativeChartModule from './components/ComparativeChartModule';
 import SuperTableModule from './components/SuperTableModule';
 import CoverageModule from './components/CoverageModule';
 
@@ -266,7 +267,10 @@ export default function App() {
               } 
             />
           ) : (
-            <ModalitiesTableModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
+            <>
+              <ModalitiesTableModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
+              <ComparativeChartModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
+            </>
           )}
 
           {/* Section 6: Coverage (Real Data 2026) */}
