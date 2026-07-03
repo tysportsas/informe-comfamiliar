@@ -8,19 +8,25 @@ function parseBothTables(filename) {
     for (const sheet of workbook.SheetNames) {
         const ws = workbook.Sheets[sheet];
         const json = XLSX.utils.sheet_to_json(ws, {header: 1});
+        let isSuper = false;
         for (const row of json) {
-            if (row[0] === 'TOTAL GENERAL') {
-                facturados.total += row[1] || 0;
-                facturados.cats.A += row[3] || 0;
-                facturados.cats.B += row[4] || 0;
-                facturados.cats.C += row[5] || 0;
-                facturados.cats.D += row[6] || 0;
-            } else if (row[0] === 'Total general' || row[0] === 'TOTAL GENERAL SUPER') {
-                superInfo.total += row[1] || 0;
-                superInfo.cats.A += row[3] || 0;
-                superInfo.cats.B += row[4] || 0;
-                superInfo.cats.C += row[5] || 0;
-                superInfo.cats.D += row[6] || 0;
+            if (row[0] && typeof row[0] === 'string' && row[0].includes('INFORMACION SUPER')) {
+                isSuper = true;
+            }
+            if (row[0] === 'TOTAL GENERAL' || row[0] === 'Total general' || row[0] === 'TOTAL GENERAL SUPER') {
+                if (!isSuper) {
+                    facturados.total += row[1] || 0;
+                    facturados.cats.A += row[3] || 0;
+                    facturados.cats.B += row[4] || 0;
+                    facturados.cats.C += row[5] || 0;
+                    facturados.cats.D += row[6] || 0;
+                } else {
+                    superInfo.total += row[1] || 0;
+                    superInfo.cats.A += row[3] || 0;
+                    superInfo.cats.B += row[4] || 0;
+                    superInfo.cats.C += row[5] || 0;
+                    superInfo.cats.D += row[6] || 0;
+                }
             }
         }
     }

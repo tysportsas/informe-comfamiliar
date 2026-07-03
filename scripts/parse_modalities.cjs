@@ -2,7 +2,7 @@ const fs = require('fs');
 const XLSX = require('xlsx');
 
 function parseFiles() {
-    const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO'];
+    const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO'];
     const files = [
         { file: '../data_2026.xlsx', linea: 'Deporte' },
         { file: '../data_2026_recreacion.xlsx', linea: 'Recreación' }
@@ -54,7 +54,7 @@ function parseFiles() {
                     if (superTotalIndex > -1 && typeof row[superTotalIndex] === 'number') {
                         const val = row[superTotalIndex];
                         if (!data.informacion_super[linea].Todas[firstCell]) {
-                            data.informacion_super[linea].Todas[firstCell] = { Enero:0, Febrero:0, Marzo:0, Abril:0, Mayo:0 };
+                            data.informacion_super[linea].Todas[firstCell] = { Enero:0, Febrero:0, Marzo:0, Abril:0, Mayo:0, Junio:0 };
                         }
                         data.informacion_super[linea].Todas[firstCell][mKey] += val;
                     } else if (superTotalIndex > -1 && firstCell !== '' && firstCell !== 'ACTIVIDAD SUPER') {
@@ -75,7 +75,7 @@ function parseFiles() {
                             data.servicios_facturados[linea][sede] = {};
                         }
                         if (!data.servicios_facturados[linea][sede][firstCell]) {
-                            data.servicios_facturados[linea][sede][firstCell] = { Enero:0, Febrero:0, Marzo:0, Abril:0, Mayo:0 };
+                            data.servicios_facturados[linea][sede][firstCell] = { Enero:0, Febrero:0, Marzo:0, Abril:0, Mayo:0, Junio:0 };
                         }
                         data.servicios_facturados[linea][sede][firstCell][mKey] += val;
                     }

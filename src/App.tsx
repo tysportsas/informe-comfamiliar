@@ -23,7 +23,7 @@ const coverageData = coverageDataRaw as any;
 
 export default function App() {
   // --- States ---
-  const [periodOption, setPeriodOption] = useState<'jan_may' | 'jan_jun'>('jan_may');
+  const [periodOption, setPeriodOption] = useState<'jan_may' | 'jan_jun'>('jan_jun');
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('ALL');
   const [coverageSource, setCoverageSource] = useState<CoverageSource>('servicios_facturados');
 
@@ -50,7 +50,7 @@ export default function App() {
   // --- Calculations ---
   const monthsLimit = periodOption === 'jan_may' ? 5 : 6;
   const periodLabel = periodOption === 'jan_may' ? 'Enero - Mayo' : 'Enero - Junio';
-  const hasIncompleteJune = periodOption === 'jan_jun';
+  const hasIncompleteJune = false; // June data is now available
 
   // Extract year records
   const data2025 = reportData.years['2025'];
@@ -178,13 +178,7 @@ export default function App() {
     document.body.removeChild(link);
   };
 
-  const handleUpdateCoverageAllocation = (year: 2025 | 2026, alloc: CoverageAllocation) => {
-    if (year === 2025) {
-      setCoverageAllocation2025(alloc);
-    } else {
-      setCoverageAllocation2026(alloc);
-    }
-  };
+
 
   return (
     <div className="flex flex-col md:flex-row h-auto md:h-screen print:h-auto print:overflow-visible print:block w-full bg-slate-50 text-slate-900 font-sans overflow-auto md:overflow-hidden">

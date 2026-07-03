@@ -309,6 +309,68 @@
         "total_per": 0,
         "total_uso": 0
       }
+    ],
+    "JUNIO": [
+      {
+        "modality": "Recreación dirigida",
+        "a_per": 33,
+        "a_uso": 65,
+        "b_per": 17,
+        "b_uso": 26,
+        "c_per": 2,
+        "c_uso": 3,
+        "d_per": 8,
+        "d_uso": 17,
+        "emp_per": 0,
+        "emp_uso": 0,
+        "total_per": 0,
+        "total_uso": 0
+      },
+      {
+        "modality": "Escuelas deportivas",
+        "a_per": 3039,
+        "a_uso": 5065,
+        "b_per": 1690,
+        "b_uso": 2841,
+        "c_per": 364,
+        "c_uso": 600,
+        "d_per": 673,
+        "d_uso": 1016,
+        "emp_per": 0,
+        "emp_uso": 0,
+        "total_per": 1,
+        "total_uso": 1
+      },
+      {
+        "modality": "Torneos Deportivos",
+        "a_per": 25,
+        "a_uso": 26,
+        "b_per": 8,
+        "b_uso": 8,
+        "c_per": 4,
+        "c_uso": 4,
+        "d_per": 34,
+        "d_uso": 36,
+        "emp_per": 0,
+        "emp_uso": 0,
+        "total_per": 6,
+        "total_uso": 13
+      },
+      {
+        "modality": "Gimnasio",
+        "a_per": 112,
+        "a_uso": 228,
+        "b_per": 54,
+        "b_uso": 86,
+        "c_per": 4,
+        "c_uso": 4,
+        "d_per": 6,
+        "d_uso": 13,
+        "emp_per": 0,
+        "emp_uso": 0,
+        "total_per": 0,
+        "total_uso": 0
+      }
     ]
   },
   "Recreación": {
@@ -515,6 +577,68 @@
         "emp_uso": 1,
         "total_per": 401,
         "total_uso": 407
+      }
+    ],
+    "JUNIO": [
+      {
+        "modality": "Recreación dirigida",
+        "a_per": 513,
+        "a_uso": 845,
+        "b_per": 285,
+        "b_uso": 466,
+        "c_per": 67,
+        "c_uso": 118,
+        "d_per": 91,
+        "d_uso": 132,
+        "emp_per": 6,
+        "emp_uso": 80,
+        "total_per": 962,
+        "total_uso": 1641
+      },
+      {
+        "modality": "Programas vacacionales y turísticos (infraestructura de la caja)",
+        "a_per": 80,
+        "a_uso": 122,
+        "b_per": 74,
+        "b_uso": 121,
+        "c_per": 13,
+        "c_uso": 20,
+        "d_per": 32,
+        "d_uso": 45,
+        "emp_per": 0,
+        "emp_uso": 0,
+        "total_per": 199,
+        "total_uso": 308
+      },
+      {
+        "modality": "Vacaciones recreativas",
+        "a_per": 794,
+        "a_uso": 856,
+        "b_per": 271,
+        "b_uso": 290,
+        "c_per": 7,
+        "c_uso": 8,
+        "d_per": 5,
+        "d_uso": 6,
+        "emp_per": 0,
+        "emp_uso": 0,
+        "total_per": 1077,
+        "total_uso": 1160
+      },
+      {
+        "modality": "Otros eventos de tipo social celebrados con o sin infraestructura de las Cajas de Compensación Famil",
+        "a_per": 3,
+        "a_uso": 3,
+        "b_per": 3,
+        "b_uso": 3,
+        "c_per": 0,
+        "c_uso": 0,
+        "d_per": 12,
+        "d_uso": 12,
+        "emp_per": 2,
+        "emp_uso": 50,
+        "total_per": 20,
+        "total_uso": 68
       }
     ]
   }

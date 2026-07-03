@@ -16,11 +16,17 @@ function getMonthlyData(filename) {
         const json = XLSX.utils.sheet_to_json(ws, {header: 1});
         let fMonth = 0;
         let sMonth = 0;
+        let isSuper = false;
         for (const row of json) {
-            if (row[0] === 'TOTAL GENERAL') {
-                fMonth += row[1] || 0;
-            } else if (row[0] === 'Total general' || row[0] === 'TOTAL GENERAL SUPER') {
-                sMonth += row[1] || 0;
+            if (row[0] && typeof row[0] === 'string' && row[0].includes('INFORMACION SUPER')) {
+                isSuper = true;
+            }
+            if (row[0] === 'TOTAL GENERAL' || row[0] === 'Total general' || row[0] === 'TOTAL GENERAL SUPER') {
+                if (!isSuper) {
+                    fMonth += row[1] || 0;
+                } else {
+                    sMonth += row[1] || 0;
+                }
             }
         }
         monthlyFacturados.push(fMonth);

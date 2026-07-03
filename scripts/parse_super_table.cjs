@@ -1,11 +1,11 @@
 const XLSX = require('xlsx');
 const fs = require('fs');
 
-const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO'];
+const months = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO'];
 
 const files = {
-  Deporte: 'data_2026.xlsx',
-  Recreación: 'data_2026_recreacion.xlsx'
+  Deporte: '../data_2026.xlsx',
+  Recreación: '../data_2026_recreacion.xlsx'
 };
 
 const outputData = {
@@ -90,5 +90,5 @@ function parseSuperTable(filePath, groupName) {
 parseSuperTable(files.Deporte, 'Deporte');
 parseSuperTable(files.Recreación, 'Recreación');
 
-fs.writeFileSync('src/data/super_table_data.json', JSON.stringify(outputData, null, 2));
+fs.writeFileSync('../src/data/super_table_data.json', JSON.stringify(outputData, null, 2));
 console.log('Successfully generated src/data/super_table_data.json');

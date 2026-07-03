@@ -7,350 +7,400 @@
           "Febrero": 10,
           "Marzo": 12,
           "Abril": 13,
-          "Mayo": 13
+          "Mayo": 13,
+          "Junio": 6
         },
         "BODYTECH ONE": {
           "Enero": 101,
           "Febrero": 101,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "CLUB CAMINANTES": {
           "Enero": 114,
           "Febrero": 160,
           "Marzo": 163,
           "Abril": 136,
-          "Mayo": 101
+          "Mayo": 101,
+          "Junio": 46
         },
         "ESCUELA DE AJEDREZ": {
           "Enero": 18,
           "Febrero": 29,
           "Marzo": 24,
           "Abril": 20,
-          "Mayo": 19
+          "Mayo": 19,
+          "Junio": 5
         },
         "ESCUELA DE BALONCESTO": {
           "Enero": 103,
           "Febrero": 133,
           "Marzo": 151,
           "Abril": 138,
-          "Mayo": 138
+          "Mayo": 138,
+          "Junio": 57
         },
         "ESCUELA DE BOLOS": {
           "Enero": 56,
           "Febrero": 74,
           "Marzo": 79,
           "Abril": 76,
-          "Mayo": 76
+          "Mayo": 76,
+          "Junio": 28
         },
         "ESCUELA DE FUTBOL": {
           "Enero": 469,
           "Febrero": 614,
           "Marzo": 570,
           "Abril": 556,
-          "Mayo": 587
+          "Mayo": 587,
+          "Junio": 324
         },
         "ESCUELA DE FUTBOL FEMENINO": {
           "Enero": 24,
           "Febrero": 29,
           "Marzo": 28,
           "Abril": 32,
-          "Mayo": 28
+          "Mayo": 28,
+          "Junio": 22
         },
         "ESCUELA DE PATINAJE": {
           "Enero": 302,
           "Febrero": 407,
           "Marzo": 439,
           "Abril": 461,
-          "Mayo": 467
+          "Mayo": 467,
+          "Junio": 242
         },
         "ESCUELA DE TAEKWONDO": {
           "Enero": 113,
           "Febrero": 152,
           "Marzo": 173,
           "Abril": 168,
-          "Mayo": 171
+          "Mayo": 171,
+          "Junio": 85
         },
         "ESCUELA DE TENIS DE CAMPO NINO": {
           "Enero": 64,
           "Febrero": 77,
           "Marzo": 76,
           "Abril": 81,
-          "Mayo": 83
+          "Mayo": 83,
+          "Junio": 38
         },
         "ESCUELA DE TENIS DE MESA - NINO": {
           "Enero": 39,
           "Febrero": 48,
           "Marzo": 43,
           "Abril": 43,
-          "Mayo": 41
+          "Mayo": 41,
+          "Junio": 23
         },
         "ESCUELA DE VOLEIBOL": {
           "Enero": 156,
           "Febrero": 218,
           "Marzo": 208,
           "Abril": 201,
-          "Mayo": 208
+          "Mayo": 208,
+          "Junio": 103
         },
         "FUTBOL ELITE": {
           "Enero": 95,
           "Febrero": 145,
           "Marzo": 133,
           "Abril": 118,
-          "Mayo": 117
+          "Mayo": 117,
+          "Junio": 63
         },
         "GIMNASIO PAQUETE 10 SESIONES": {
           "Enero": 45,
           "Febrero": 56,
           "Marzo": 91,
           "Abril": 86,
-          "Mayo": 94
+          "Mayo": 94,
+          "Junio": 62
         },
         "GIMNASIO PAQUETE 5 SESIONES": {
           "Enero": 40,
           "Febrero": 36,
           "Marzo": 69,
           "Abril": 61,
-          "Mayo": 63
+          "Mayo": 63,
+          "Junio": 33
         },
         "NATACION ELITE": {
           "Enero": 27,
           "Febrero": 35,
           "Marzo": 38,
           "Abril": 37,
-          "Mayo": 46
+          "Mayo": 46,
+          "Junio": 20
         },
         "PATINAJE ELITE": {
           "Enero": 12,
           "Febrero": 19,
           "Marzo": 26,
           "Abril": 22,
-          "Mayo": 21
+          "Mayo": 21,
+          "Junio": 7
         },
         "PROGRAMA CLUB DE LA SALUD": {
           "Enero": 52,
           "Febrero": 81,
           "Marzo": 93,
           "Abril": 84,
-          "Mayo": 79
+          "Mayo": 79,
+          "Junio": 42
         },
         "PROGRAMA DE NATACION DIA": {
           "Enero": 596,
           "Febrero": 862,
           "Marzo": 869,
           "Abril": 869,
-          "Mayo": 908
+          "Mayo": 908,
+          "Junio": 501
         },
         "PROGRAMA DE NATACION DIA S": {
           "Enero": 1,
           "Febrero": 1,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "PROGRAMA ESTIMULACION MOTRIZ": {
           "Enero": 289,
           "Febrero": 397,
           "Marzo": 400,
           "Abril": 360,
-          "Mayo": 358
+          "Mayo": 358,
+          "Junio": 159
         },
         "PROGRAMA MADRES GESTANTES": {
           "Enero": 27,
           "Febrero": 48,
           "Marzo": 45,
           "Abril": 48,
-          "Mayo": 42
+          "Mayo": 42,
+          "Junio": 16
         },
         "PROGRAMA NATACION NOCTURNA": {
           "Enero": 138,
           "Febrero": 189,
           "Marzo": 185,
           "Abril": 199,
-          "Mayo": 212
+          "Mayo": 212,
+          "Junio": 112
         },
         "SESION GIMNASIO": {
           "Enero": 30,
           "Febrero": 28,
           "Marzo": 59,
           "Abril": 57,
-          "Mayo": 46
+          "Mayo": 46,
+          "Junio": 30
         },
         "SMART FIT PEREIRA CERRITOS": {
           "Enero": 99,
           "Febrero": 99,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "SMART FIT PEREIRA EXITO": {
           "Enero": 99,
           "Febrero": 100,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "SMART FIT PEREIRA LA 14": {
           "Enero": 99,
           "Febrero": 100,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "TAEKWONDO ELITE": {
           "Enero": 30,
           "Febrero": 33,
           "Marzo": 37,
           "Abril": 38,
-          "Mayo": 34
+          "Mayo": 34,
+          "Junio": 29
         },
         "TENIS DE CAMPO ADULTO": {
           "Enero": 88,
           "Febrero": 115,
           "Marzo": 118,
           "Abril": 118,
-          "Mayo": 125
+          "Mayo": 125,
+          "Junio": 27
         },
         "TENIS DE CAMPO ELITE": {
           "Enero": 4,
           "Febrero": 6,
           "Marzo": 5,
           "Abril": 5,
-          "Mayo": 5
+          "Mayo": 5,
+          "Junio": 4
         },
         "TENIS DE MESA ADULTO": {
           "Enero": 14,
           "Febrero": 20,
           "Marzo": 23,
           "Abril": 28,
-          "Mayo": 28
+          "Mayo": 28,
+          "Junio": 9
         },
         "VOLEIBOL ELITE": {
           "Enero": 36,
           "Febrero": 39,
           "Marzo": 41,
           "Abril": 44,
-          "Mayo": 48
+          "Mayo": 48,
+          "Junio": 26
         },
         "BODYTECH PREMIUM": {
           "Enero": 99,
           "Febrero": 100,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "ELITES GOLD": {
           "Enero": 50,
           "Febrero": 53,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "INSCRIPCION FESTIVAL DEPORTIVO": {
           "Enero": 0,
           "Febrero": 1,
           "Marzo": 0,
           "Abril": 3,
-          "Mayo": 64
+          "Mayo": 64,
+          "Junio": 25
         },
         "JUEGOS INTEREMPRESARIALES FUTBOL": {
           "Enero": 0,
           "Febrero": 1,
           "Marzo": 0,
           "Abril": 3,
-          "Mayo": 3
+          "Mayo": 3,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES FUTSAL SINTETICA": {
           "Enero": 0,
           "Febrero": 1,
           "Marzo": 1,
           "Abril": 1,
-          "Mayo": 2
+          "Mayo": 2,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES FUTBOL 8": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 2,
           "Abril": 7,
-          "Mayo": 4
+          "Mayo": 4,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES TENIS DE CAMPO PARTICIPANTE": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 1,
           "Abril": 4,
-          "Mayo": 4
+          "Mayo": 4,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES TENIS DE MESA PARTICIPANTE": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 1,
           "Abril": 5,
-          "Mayo": 2
+          "Mayo": 2,
+          "Junio": 0
         },
         "MONITOR DEPORTIVO CONVENIOS": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 1,
           "Abril": 0,
-          "Mayo": 2
+          "Mayo": 2,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES AJEDREZ PARTICIPANTE": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 4,
-          "Mayo": 1
+          "Mayo": 1,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES BALONCESTO": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 1,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES BOLOS MIXTO": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 6,
-          "Mayo": 1
+          "Mayo": 1,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES NATACION PARTICIPANTE": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 2,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES VOLEIBOL": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 5,
-          "Mayo": 2
+          "Mayo": 2,
+          "Junio": 0
         },
         "ESCUELA DE PADRES": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 41
+          "Mayo": 41,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES SAPO MIXTO": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 1
+          "Mayo": 1,
+          "Junio": 0
         },
         "JUEGOS INTEREMPRESARIALES VOLEIBOL ARENA": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 1
+          "Mayo": 1,
+          "Junio": 0
         }
       },
       "Santa Rosa": {
@@ -359,35 +409,40 @@
           "Febrero": 92,
           "Marzo": 98,
           "Abril": 99,
-          "Mayo": 97
+          "Mayo": 97,
+          "Junio": 44
         },
         "CLUB DE LA SALUD STA ROSA": {
           "Enero": 9,
           "Febrero": 10,
           "Marzo": 12,
           "Abril": 17,
-          "Mayo": 14
+          "Mayo": 14,
+          "Junio": 5
         },
         "ESCUELA DE FUTBOL SANTA ROSA": {
           "Enero": 119,
           "Febrero": 140,
           "Marzo": 150,
           "Abril": 146,
-          "Mayo": 134
+          "Mayo": 134,
+          "Junio": 68
         },
         "ESCUELA DE TAEKWONDO\tSANTA ROSA": {
           "Enero": 30,
           "Febrero": 42,
           "Marzo": 47,
           "Abril": 45,
-          "Mayo": 47
+          "Mayo": 47,
+          "Junio": 30
         },
         "ACTIVATE COMFAMILIAR SANTA ROSA": {
           "Enero": 0,
           "Febrero": 19,
           "Marzo": 25,
           "Abril": 21,
-          "Mayo": 26
+          "Mayo": 26,
+          "Junio": 13
         }
       },
       "Dosquebradas": {
@@ -396,56 +451,64 @@
           "Febrero": 118,
           "Marzo": 111,
           "Abril": 108,
-          "Mayo": 116
+          "Mayo": 116,
+          "Junio": 55
         },
         "CLUB DE LA SALUD DOSQUEBRADAS": {
           "Enero": 50,
           "Febrero": 68,
           "Marzo": 68,
           "Abril": 52,
-          "Mayo": 47
+          "Mayo": 47,
+          "Junio": 25
         },
         "FUTBOL DOSQUEBRADAS": {
           "Enero": 125,
           "Febrero": 165,
           "Marzo": 181,
           "Abril": 203,
-          "Mayo": 213
+          "Mayo": 213,
+          "Junio": 115
         },
         "NATACION DIA DOSQUEBRADAS": {
           "Enero": 297,
           "Febrero": 488,
           "Marzo": 644,
           "Abril": 787,
-          "Mayo": 838
+          "Mayo": 838,
+          "Junio": 439
         },
         "NATACION NOCTURNA DOSQUEBRADAS": {
           "Enero": 184,
           "Febrero": 181,
           "Marzo": 210,
           "Abril": 283,
-          "Mayo": 300
+          "Mayo": 300,
+          "Junio": 133
         },
         "SMART FIT DOSQUEBRADAS": {
           "Enero": 102,
           "Febrero": 101,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "VOLEIBOL DOSQUEBRADAS": {
           "Enero": 296,
           "Febrero": 389,
           "Marzo": 426,
           "Abril": 452,
-          "Mayo": 453
+          "Mayo": 453,
+          "Junio": 224
         },
         "ACTIVATE COMFAMILIAR DOSQUEBRADAS": {
           "Enero": 0,
           "Febrero": 20,
           "Marzo": 13,
           "Abril": 18,
-          "Mayo": 29
+          "Mayo": 29,
+          "Junio": 15
         }
       },
       "Quinchía": {
@@ -454,28 +517,32 @@
           "Febrero": 33,
           "Marzo": 29,
           "Abril": 28,
-          "Mayo": 23
+          "Mayo": 23,
+          "Junio": 11
         },
         "ESCUELA NATACION QUINCHIA": {
           "Enero": 45,
           "Febrero": 65,
           "Marzo": 79,
           "Abril": 98,
-          "Mayo": 92
+          "Mayo": 92,
+          "Junio": 39
         },
         "ACTIVATE COMFAMILIAR QUINCHIA": {
           "Enero": 0,
           "Febrero": 12,
           "Marzo": 14,
           "Abril": 18,
-          "Mayo": 24
+          "Mayo": 24,
+          "Junio": 5
         },
         "ESCUELA PATINAJE QUINCHIA": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 21,
-          "Mayo": 24
+          "Mayo": 24,
+          "Junio": 9
         }
       }
     },
@@ -486,217 +553,264 @@
           "Febrero": 0,
           "Marzo": 1,
           "Abril": 2,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "ANIMADOR SOCIOCULTURAL": {
           "Enero": 1,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "CLASE INDIVIDUAL DE CANTO Y EXPRESION": {
           "Enero": 25,
           "Febrero": 31,
           "Marzo": 37,
           "Abril": 37,
-          "Mayo": 36
+          "Mayo": 36,
+          "Junio": 21
         },
         "CLASES INDIVIDUALES DE INSTRUMENTO E INICIACION MUSICAL": {
           "Enero": 45,
           "Febrero": 76,
           "Marzo": 74,
           "Abril": 77,
-          "Mayo": 82
+          "Mayo": 82,
+          "Junio": 41
         },
         "CORO COMFAMILIAR": {
           "Enero": 13,
           "Febrero": 18,
           "Marzo": 13,
           "Abril": 9,
-          "Mayo": 18
+          "Mayo": 18,
+          "Junio": 6
         },
         "CURSO DE VIOLIN": {
           "Enero": 9,
           "Febrero": 16,
           "Marzo": 15,
           "Abril": 13,
-          "Mayo": 14
+          "Mayo": 14,
+          "Junio": 7
         },
         "INICIACION MUSICAL": {
           "Enero": 9,
           "Febrero": 19,
           "Marzo": 23,
           "Abril": 28,
-          "Mayo": 30
+          "Mayo": 30,
+          "Junio": 15
         },
         "RECREADOR EMPRESA": {
           "Enero": 1,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "RECREADOR FIESTA INFANTIL": {
           "Enero": 1,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "TALLER DE ARTES": {
           "Enero": 41,
           "Febrero": 56,
           "Marzo": 60,
           "Abril": 74,
-          "Mayo": 70
+          "Mayo": 70,
+          "Junio": 38
         },
         "TALLER DE BAILE MODERNO": {
           "Enero": 29,
           "Febrero": 41,
           "Marzo": 41,
           "Abril": 42,
-          "Mayo": 44
+          "Mayo": 44,
+          "Junio": 19
         },
         "TALLER DE BALLET": {
           "Enero": 95,
           "Febrero": 117,
           "Marzo": 120,
           "Abril": 127,
-          "Mayo": 132
+          "Mayo": 132,
+          "Junio": 74
         },
         "TALLER DE BATERIA": {
           "Enero": 18,
           "Febrero": 21,
           "Marzo": 16,
           "Abril": 11,
-          "Mayo": 14
+          "Mayo": 14,
+          "Junio": 3
         },
         "TALLER DE CHEFF INFANTIL": {
           "Enero": 56,
           "Febrero": 73,
           "Marzo": 75,
           "Abril": 76,
-          "Mayo": 68
+          "Mayo": 68,
+          "Junio": 33
         },
         "TALLER DE DIBUJO": {
           "Enero": 29,
           "Febrero": 49,
           "Marzo": 47,
           "Abril": 44,
-          "Mayo": 46
+          "Mayo": 46,
+          "Junio": 21
         },
         "TALLER DE GUITARRA": {
           "Enero": 26,
           "Febrero": 36,
           "Marzo": 32,
           "Abril": 35,
-          "Mayo": 33
+          "Mayo": 33,
+          "Junio": 18
         },
         "TALLER DE INGLES LUDICO": {
           "Enero": 62,
           "Febrero": 98,
           "Marzo": 114,
           "Abril": 103,
-          "Mayo": 89
+          "Mayo": 89,
+          "Junio": 54
         },
         "TALLER DE ORGANETA (T M)": {
           "Enero": 15,
           "Febrero": 23,
           "Marzo": 22,
           "Abril": 23,
-          "Mayo": 24
+          "Mayo": 24,
+          "Junio": 12
         },
         "TALLER DE TECNICA VOCAL": {
           "Enero": 44,
           "Febrero": 61,
           "Marzo": 62,
           "Abril": 60,
-          "Mayo": 63
+          "Mayo": 63,
+          "Junio": 33
         },
         "VACACIONES RECREATIVAS": {
           "Enero": 2,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 536
         },
         "INSTRUCTOR DE BIENESTAR": {
           "Enero": 0,
           "Febrero": 3,
           "Marzo": 1,
           "Abril": 1,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "RECREACIÓN VINCULACIÓN COLEGIOS RISARALDA": {
           "Enero": 0,
           "Febrero": 125,
           "Marzo": 168,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "ALQUILER AMPLIFICACION": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 1,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "DIA DE LA FAMILIA": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 85,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "CELEBRACIÓN DEL MES DE LA NIÑEZ Y LA RECREACIÓN": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 34,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "DIA MUNDIAL DE LA ACTIVIDAD FISICA": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 12,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "MACRO JUEGO": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 1,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "CELBRACIÓN DIA DE LAS MADRES ACTIVIDAD FISICA": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 52
+          "Mayo": 52,
+          "Junio": 0
         },
         "EVENTO FERIA SABOR A MI": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 42
+          "Mayo": 42,
+          "Junio": 0
         },
         "FESTIVAL DEL MOVIMIENTO ESTIMULACIÓN MOTRIZ": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 158
+          "Mayo": 158,
+          "Junio": 0
         },
         "TRAVESIA CICLISTICA": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 139
+          "Mayo": 139,
+          "Junio": 0
+        },
+        "VACACIONES RECREATIVAS ARTISTICAS PEREIRA": {
+          "Enero": 0,
+          "Febrero": 0,
+          "Marzo": 0,
+          "Abril": 0,
+          "Mayo": 0,
+          "Junio": 62
+        },
+        "VACACIONES RECREO DEPORTIVAS PEREIRA": {
+          "Enero": 0,
+          "Febrero": 0,
+          "Marzo": 0,
+          "Abril": 0,
+          "Mayo": 0,
+          "Junio": 99
         }
       },
       "Santa Rosa": {
@@ -705,28 +819,40 @@
           "Febrero": 35,
           "Marzo": 42,
           "Abril": 44,
-          "Mayo": 43
+          "Mayo": 43,
+          "Junio": 26
         },
         "CHEF INFAN SANTAROSA": {
           "Enero": 17,
           "Febrero": 35,
           "Marzo": 37,
           "Abril": 38,
-          "Mayo": 41
+          "Mayo": 41,
+          "Junio": 22
         },
         "INGLES LUDICO STA ROSA": {
           "Enero": 44,
           "Febrero": 70,
           "Marzo": 77,
           "Abril": 81,
-          "Mayo": 90
+          "Mayo": 90,
+          "Junio": 39
         },
         "MUESTRA ARTISTICA DE BALLET SANTA ROSA": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 39
+          "Mayo": 39,
+          "Junio": 0
+        },
+        "VACACIONES RECREATIVAS ARTISTICAS SANTA ROSA": {
+          "Enero": 0,
+          "Febrero": 0,
+          "Marzo": 0,
+          "Abril": 0,
+          "Mayo": 0,
+          "Junio": 43
         }
       },
       "Quinchía": {
@@ -735,14 +861,24 @@
           "Febrero": 23,
           "Marzo": 25,
           "Abril": 26,
-          "Mayo": 23
+          "Mayo": 23,
+          "Junio": 9
         },
         "TALLER PINTURA QUINCHIA": {
           "Enero": 50,
           "Febrero": 61,
           "Marzo": 69,
           "Abril": 70,
-          "Mayo": 59
+          "Mayo": 59,
+          "Junio": 26
+        },
+        "VACACIONES RECREATIVAS ARTISTICAS QUINCHIA": {
+          "Enero": 0,
+          "Febrero": 0,
+          "Marzo": 0,
+          "Abril": 0,
+          "Mayo": 0,
+          "Junio": 9
         }
       },
       "Dosquebradas": {
@@ -751,35 +887,40 @@
           "Febrero": 59,
           "Marzo": 66,
           "Abril": 76,
-          "Mayo": 73
+          "Mayo": 73,
+          "Junio": 28
         },
         "TALLER DIBUJO DOSQUEBRADAS": {
           "Enero": 15,
           "Febrero": 31,
           "Marzo": 37,
           "Abril": 40,
-          "Mayo": 37
+          "Mayo": 37,
+          "Junio": 18
         },
         "VACACIONES RECREATIVAS ARTISTICAS DOSQUEBRADAS": {
           "Enero": 3,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 59
         },
         "ESTIMULACION MOTRIZ DOSQUEBRADAS": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 150,
           "Abril": 190,
-          "Mayo": 207
+          "Mayo": 207,
+          "Junio": 81
         },
         "VIA ACTIVA DOSQUEBRADAS": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 12
+          "Mayo": 12,
+          "Junio": 6
         }
       }
     }
@@ -792,35 +933,40 @@
           "Febrero": 5391,
           "Marzo": 5680,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "Gimnasio": {
           "Enero": 753,
           "Febrero": 763,
           "Marzo": 188,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "Recreación dirigida": {
           "Enero": 0,
           "Febrero": 51,
           "Marzo": 52,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "Torneos Deportivos": {
           "Enero": 0,
           "Febrero": 2,
           "Marzo": 5,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "Otros eventos de tipo social celebrados con o sin infraestructura de las Cajas de Compensación Famil": {
           "Enero": 0,
           "Febrero": 0,
           "Marzo": 1,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         }
       }
     },
@@ -831,14 +977,16 @@
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         },
         "Vacaciones recreativas": {
           "Enero": 5,
           "Febrero": 0,
           "Marzo": 0,
           "Abril": 0,
-          "Mayo": 0
+          "Mayo": 0,
+          "Junio": 0
         }
       }
     }

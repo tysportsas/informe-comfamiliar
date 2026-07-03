@@ -16,7 +16,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
 
   // Helper para extraer la data según la sede filtrada y la fuente
   const getTableData = (linea: 'Deporte' | 'Recreación') => {
-    let rawData: Record<string, { Enero: number; Febrero: number; Marzo: number; Abril: number; Mayo: number }> = {};
+    let rawData: Record<string, { Enero: number; Febrero: number; Marzo: number; Abril: number; Mayo: number; Junio: number }> = {};
     
     const sourceData = (modalitiesDataRaw as any)[coverageSource] || {};
     const lineaData = sourceData[linea] || {};
@@ -26,7 +26,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
       Object.keys(lineaData).forEach(sede => {
         Object.keys(lineaData[sede]).forEach(modality => {
           if (!rawData[modality]) {
-            rawData[modality] = { Enero: 0, Febrero: 0, Marzo: 0, Abril: 0, Mayo: 0 };
+            rawData[modality] = { Enero: 0, Febrero: 0, Marzo: 0, Abril: 0, Mayo: 0, Junio: 0 };
           }
           const months = lineaData[sede][modality];
           rawData[modality].Enero += months.Enero || 0;
@@ -34,6 +34,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
           rawData[modality].Marzo += months.Marzo || 0;
           rawData[modality].Abril += months.Abril || 0;
           rawData[modality].Mayo += months.Mayo || 0;
+          rawData[modality].Junio += months.Junio || 0;
         });
       });
     } else {
@@ -50,7 +51,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
     // Convert to array and add totals
     const rows = Object.keys(rawData).map(modality => {
       const d = rawData[modality];
-      const total = (d.Enero || 0) + (d.Febrero || 0) + (d.Marzo || 0) + (d.Abril || 0) + (d.Mayo || 0);
+      const total = (d.Enero || 0) + (d.Febrero || 0) + (d.Marzo || 0) + (d.Abril || 0) + (d.Mayo || 0) + (d.Junio || 0);
       return {
         name: modality,
         enero: d.Enero || 0,
@@ -58,6 +59,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
         marzo: d.Marzo || 0,
         abril: d.Abril || 0,
         mayo: d.Mayo || 0,
+        junio: d.Junio || 0,
         total
       };
     });
@@ -90,9 +92,10 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
         marzo: acc.marzo + row.marzo,
         abril: acc.abril + row.abril,
         mayo: acc.mayo + row.mayo,
+        junio: acc.junio + row.junio,
         total: acc.total + row.total,
       }),
-      { enero: 0, febrero: 0, marzo: 0, abril: 0, mayo: 0, total: 0 }
+      { enero: 0, febrero: 0, marzo: 0, abril: 0, mayo: 0, junio: 0, total: 0 }
     );
 
     return (
@@ -108,6 +111,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
                 <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Marzo</th>
                 <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Abril</th>
                 <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Mayo</th>
+                <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Junio</th>
                 <th className="py-2 px-3 font-semibold text-slate-700 text-center bg-slate-200/50">Total</th>
               </tr>
             </thead>
@@ -120,6 +124,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
                   <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.marzo.toLocaleString('es-CO')}</td>
                   <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.abril.toLocaleString('es-CO')}</td>
                   <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.mayo.toLocaleString('es-CO')}</td>
+                  <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.junio.toLocaleString('es-CO')}</td>
                   <td className="py-1.5 px-3 text-emerald-700 text-center font-bold bg-slate-50/50">{row.total.toLocaleString('es-CO')}</td>
                 </tr>
               ))}
@@ -131,6 +136,7 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
                 <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.marzo.toLocaleString('es-CO')}</td>
                 <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.abril.toLocaleString('es-CO')}</td>
                 <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.mayo.toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.junio.toLocaleString('es-CO')}</td>
                 <td className="py-2 px-3 text-slate-800 text-center bg-slate-200/50">{colTotals.total.toLocaleString('es-CO')}</td>
               </tr>
             </tbody>

@@ -23,7 +23,8 @@ MONTHS_MAP = {
     'FEBRERO': 'Febrero',
     'MARZO': 'Marzo',
     'ABRIL': 'Abril',
-    'MAYO': 'Mayo'
+    'MAYO': 'Mayo',
+    'JUNIO': 'Junio'
 }
 
 def process_file(filepath, codes_map, line_name):
@@ -75,8 +76,8 @@ def process_file(filepath, codes_map, line_name):
     return line_data
 
 def main():
-    file1 = "/tmp/comfamiliar_data/file1.xlsx"
-    file2 = "/tmp/comfamiliar_data/file2.xlsx"
+    file1 = "../data_2026.xlsx"
+    file2 = "../data_2026_recreacion.xlsx"
     
     print("Processing Deportes...")
     deporte_data = process_file(file1, DEPORTE_CODES, 'Deporte')
@@ -89,7 +90,7 @@ def main():
         'Recreación': recreacion_data
     }
     
-    out_path = 'src/data/modalities_trend.json'
+    out_path = '../src/data/modalities_trend.json'
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(final_data, f, ensure_ascii=False, indent=2)
         
