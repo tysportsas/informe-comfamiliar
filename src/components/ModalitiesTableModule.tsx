@@ -1,143 +1,356 @@
 import React, { useState, useMemo } from 'react';
+import { ArrowUpRight, ArrowDownRight, BarChart2, Table } from 'lucide-react';
 import { CoverageSource } from '../types';
-import modalitiesDataRaw from '../data/modalities_data.json';
+import modalitiesData2026Raw from '../data/modalities_data.json';
+import modalitiesData2025Raw from '../data/modalities_data_2025.json';
 
 interface ModalitiesTableModuleProps {
   selectedMunicipality: string;
   coverageSource?: CoverageSource;
+  periodOption?: 'jan_may' | 'jan_jun';
 }
 
-export default function ModalitiesTableModule({ selectedMunicipality, coverageSource = 'servicios_facturados' }: ModalitiesTableModuleProps) {
+const ALL_MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'] as const;
+type Month = typeof ALL_MONTHS[number];
+
+type ViewMode = 'resumen' | 'mes_a_mes';
+
+export default function ModalitiesTableModule({
+  selectedMunicipality,
+  coverageSource = 'servicios_facturados',
+  periodOption = 'jan_jun',
+}: ModalitiesTableModuleProps) {
   const availableSedes = ['Todas', 'Pereira', 'Dosquebradas', 'Santa Rosa', 'Quinchía'];
-  
   const [sedeFilter, setSedeFilter] = useState<string>(
     selectedMunicipality === 'ALL' ? 'Todas' : selectedMunicipality
   );
+  const [viewMode, setViewMode] = useState<ViewMode>('resumen');
+  const [selectedMonth, setSelectedMonth] = useState<Month>('Enero');
 
-  // Helper para extraer la data según la sede filtrada y la fuente
-  const getTableData = (linea: 'Deporte' | 'Recreación') => {
-    let rawData: Record<string, { Enero: number; Febrero: number; Marzo: number; Abril: number; Mayo: number; Junio: number }> = {};
-    
-    const sourceData = (modalitiesDataRaw as any)[coverageSource] || {};
+  const MONTHS: Month[] = periodOption === 'jan_may'
+    ? ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo']
+    : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
+
+  // Aggregate data from a year's raw JSON
+  const aggregateData = (
+    raw: any,
+    linea: 'Deporte' | 'Recreación',
+    sede: string
+  ): Record<string, Record<string, number>> => {
+    const sourceData = raw[coverageSource] || {};
     const lineaData = sourceData[linea] || {};
+    const result: Record<string, Record<string, number>> = {};
 
-    if (sedeFilter === 'Todas') {
-      // Sumar todas las sedes
-      Object.keys(lineaData).forEach(sede => {
-        Object.keys(lineaData[sede]).forEach(modality => {
-          if (!rawData[modality]) {
-            rawData[modality] = { Enero: 0, Febrero: 0, Marzo: 0, Abril: 0, Mayo: 0, Junio: 0 };
-          }
-          const months = lineaData[sede][modality];
-          rawData[modality].Enero += months.Enero || 0;
-          rawData[modality].Febrero += months.Febrero || 0;
-          rawData[modality].Marzo += months.Marzo || 0;
-          rawData[modality].Abril += months.Abril || 0;
-          rawData[modality].Mayo += months.Mayo || 0;
-          rawData[modality].Junio += months.Junio || 0;
+    const processSede = (sedeKey: string) => {
+      const sedeData = lineaData[sedeKey] || {};
+      Object.keys(sedeData).forEach(modality => {
+        if (!result[modality]) result[modality] = {};
+        const months = sedeData[modality];
+        Object.keys(months).forEach(m => {
+          result[modality][m] = (result[modality][m] || 0) + (months[m] || 0);
         });
       });
+    };
+
+    if (sede === 'Todas') {
+      Object.keys(lineaData).forEach(s => processSede(s));
     } else {
-      // Filtrar por sede específica
-      if (lineaData[sedeFilter]) {
-        // Hacemos una copia profunda superficial para no mutar el original en caso de
-        // requerir modificaciones extra, pero aqui solo copiamos la referencia
-        Object.keys(lineaData[sedeFilter]).forEach(modality => {
-           rawData[modality] = { ...lineaData[sedeFilter][modality] };
-        });
-      }
+      processSede(sede);
     }
-
-    // Convert to array and add totals
-    const rows = Object.keys(rawData).map(modality => {
-      const d = rawData[modality];
-      const total = (d.Enero || 0) + (d.Febrero || 0) + (d.Marzo || 0) + (d.Abril || 0) + (d.Mayo || 0) + (d.Junio || 0);
-      return {
-        name: modality,
-        enero: d.Enero || 0,
-        febrero: d.Febrero || 0,
-        marzo: d.Marzo || 0,
-        abril: d.Abril || 0,
-        mayo: d.Mayo || 0,
-        junio: d.Junio || 0,
-        total
-      };
-    });
-
-    // Ordenar de mayor a menor por total
-    return rows.sort((a, b) => b.total - a.total);
+    return result;
   };
 
-  const deportesData = useMemo(() => getTableData('Deporte'), [sedeFilter, coverageSource]);
-  const talleresData = useMemo(() => getTableData('Recreación'), [sedeFilter, coverageSource]);
+  const getMergedData = (linea: 'Deporte' | 'Recreación') => {
+    const data2026 = aggregateData(modalitiesData2026Raw, linea, sedeFilter);
+    const data2025 = aggregateData(modalitiesData2025Raw, linea, sedeFilter);
+    const allModalities = new Set([...Object.keys(data2026), ...Object.keys(data2025)]);
 
-  const renderTable = (title: string, data: any[]) => {
-    if (data.length === 0) {
-      return (
-        <div className="mb-8">
-          <h3 className="text-sm font-semibold text-slate-700 mb-3">{title}</h3>
-          <p className="text-sm text-slate-400 italic">
-            {coverageSource === 'informacion_super' && sedeFilter !== 'Todas' 
-              ? 'La Base de Datos de Información Súper no cuenta con desglose por sede para estas modalidades. Selecciona "Todas" en el filtro de sede para ver los totales.' 
-              : 'No hay datos reportados para esta sede.'}
-          </p>
-        </div>
-      );
-    }
+    const rows = Array.from(allModalities).map(mod => {
+      const d26 = data2026[mod] || {};
+      const d25 = data2025[mod] || {};
 
-    const colTotals = data.reduce(
-      (acc, row) => ({
-        enero: acc.enero + row.enero,
-        febrero: acc.febrero + row.febrero,
-        marzo: acc.marzo + row.marzo,
-        abril: acc.abril + row.abril,
-        mayo: acc.mayo + row.mayo,
-        junio: acc.junio + row.junio,
-        total: acc.total + row.total,
-      }),
-      { enero: 0, febrero: 0, marzo: 0, abril: 0, mayo: 0, junio: 0, total: 0 }
-    );
+      const monthVals2026 = MONTHS.map(m => d26[m] || 0);
+      const monthVals2025 = MONTHS.map(m => d25[m] || 0);
+      const total2026 = monthVals2026.reduce((a, b) => a + b, 0);
+      const total2025 = monthVals2025.reduce((a, b) => a + b, 0);
+      const diff = total2026 - total2025;
+      const pct = total2025 > 0 ? (diff / total2025) * 100 : total2026 > 0 ? 100 : 0;
+
+      return { name: mod, monthVals2026, monthVals2025, total2026, total2025, diff, pct };
+    });
+
+    return rows
+      .filter(r => r.total2026 > 0 || r.total2025 > 0)
+      .sort((a, b) => b.total2026 - a.total2026);
+  };
+
+  const deportesData = useMemo(() => getMergedData('Deporte'), [sedeFilter, coverageSource, periodOption]);
+  const talleresData = useMemo(() => getMergedData('Recreación'), [sedeFilter, coverageSource, periodOption]);
+
+  // ─── Shared helpers ──────────────────────────────────────────────────────────
+  const fmtNum = (n: number) => n > 0 ? n.toLocaleString('es-CO') : '—';
+  const pctColor = (n: number) => n >= 0 ? 'text-emerald-600' : 'text-rose-600';
+  const pctIcon = (n: number) =>
+    n >= 0
+      ? <ArrowUpRight className="inline h-3 w-3" />
+      : <ArrowDownRight className="inline h-3 w-3" />;
+
+  // ─── RESUMEN TABLE ────────────────────────────────────────────────────────────
+  const renderResumenTable = (
+    title: string,
+    accentColor: string,
+    data: ReturnType<typeof getMergedData>
+  ) => {
+    if (data.length === 0) return <EmptyState title={title} />;
+
+    const colTotals2026 = MONTHS.map((_, i) => data.reduce((a, r) => a + r.monthVals2026[i], 0));
+    const colTotals2025 = MONTHS.map((_, i) => data.reduce((a, r) => a + r.monthVals2025[i], 0));
+    const sumTotal2026 = data.reduce((a, r) => a + r.total2026, 0);
+    const sumTotal2025 = data.reduce((a, r) => a + r.total2025, 0);
+    const sumPct = sumTotal2025 > 0 ? ((sumTotal2026 - sumTotal2025) / sumTotal2025) * 100 : 0;
 
     return (
-      <div className="mb-8 last:mb-0 page-break-inside-avoid">
-        <h3 className="text-sm font-semibold text-slate-700 mb-3">{title}</h3>
-        <div className="overflow-x-auto rounded-lg border border-slate-300">
-          <table className="w-full text-left text-sm border-collapse">
+      <div className="mb-10 last:mb-0">
+        <h3 className={`text-sm font-bold mb-3 ${accentColor}`}>{title}</h3>
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-100/80 border-b border-slate-300">
-                <th className="py-2 px-3 border-r border-slate-300 font-semibold text-slate-700 w-1/4">Modalidad</th>
-                <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Enero</th>
-                <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Febrero</th>
-                <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Marzo</th>
-                <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Abril</th>
-                <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Mayo</th>
-                <th className="py-2 px-2 border-r border-slate-300 font-semibold text-slate-700 text-center">Junio</th>
-                <th className="py-2 px-3 font-semibold text-slate-700 text-center bg-slate-200/50">Total</th>
+              <tr className="border-b border-slate-200 text-center bg-slate-50">
+                <th className="py-2 px-3 text-left text-slate-600 font-semibold border-r border-slate-200" rowSpan={2}>
+                  Modalidad
+                </th>
+                <th colSpan={MONTHS.length} className="py-2 px-2 bg-blue-50 text-blue-800 font-bold border-x border-blue-200">
+                  Usuarios 2026 (mes a mes)
+                </th>
+                <th className="py-2 px-3 bg-slate-100 text-slate-600 font-bold border-l border-slate-200" rowSpan={2}>
+                  Total 2025
+                </th>
+                <th className="py-2 px-3 bg-blue-100 text-blue-900 font-bold border-l border-blue-200" rowSpan={2}>
+                  Total 2026
+                </th>
+                <th className="py-2 px-3 text-slate-600 font-bold border-l border-slate-200" rowSpan={2}>
+                  Var. YoY
+                </th>
+              </tr>
+              <tr className="border-b border-slate-300 text-slate-500 bg-blue-50/40">
+                {MONTHS.map(m => (
+                  <th key={m} className="py-2 px-2 text-center font-semibold border-r border-blue-100 last:border-r-0">
+                    {m.slice(0, 3)}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {data.map((row, idx) => (
-                <tr key={idx} className="border-b border-slate-200 hover:bg-slate-50">
-                  <td className="py-1.5 px-3 border-r border-slate-200 text-slate-600 font-medium text-xs">{row.name}</td>
-                  <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.enero.toLocaleString('es-CO')}</td>
-                  <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.febrero.toLocaleString('es-CO')}</td>
-                  <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.marzo.toLocaleString('es-CO')}</td>
-                  <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.abril.toLocaleString('es-CO')}</td>
-                  <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.mayo.toLocaleString('es-CO')}</td>
-                  <td className="py-1.5 px-2 border-r border-slate-200 text-slate-600 text-center">{row.junio.toLocaleString('es-CO')}</td>
-                  <td className="py-1.5 px-3 text-emerald-700 text-center font-bold bg-slate-50/50">{row.total.toLocaleString('es-CO')}</td>
-                </tr>
-              ))}
-              {/* Row Total */}
-              <tr className="bg-slate-100/50 border-t-2 border-slate-300 font-semibold">
+              {data.map((row, idx) => {
+                const isNew = row.total2025 === 0;
+                return (
+                  <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/60 transition-colors">
+                    <td className="py-1.5 px-3 border-r border-slate-200 text-slate-700 font-medium whitespace-nowrap">{row.name}</td>
+                    {row.monthVals2026.map((v, mi) => (
+                      <td key={mi} className="py-1.5 px-2 text-center text-slate-600 border-r border-blue-50 bg-blue-50/20">
+                        {v > 0 ? v.toLocaleString('es-CO') : <span className="text-slate-300">—</span>}
+                      </td>
+                    ))}
+                    <td className="py-1.5 px-3 text-center text-slate-500 border-l border-slate-200 bg-slate-50/40">
+                      {row.total2025 > 0 ? row.total2025.toLocaleString('es-CO') : <span className="text-slate-300">—</span>}
+                    </td>
+                    <td className="py-1.5 px-3 text-center font-bold text-blue-900 border-l border-blue-100 bg-blue-50/30">
+                      {row.total2026.toLocaleString('es-CO')}
+                    </td>
+                    <td className="py-1.5 px-3 text-center border-l border-slate-200">
+                      {isNew ? (
+                        <span className="text-slate-400 text-xs italic">Nuevo</span>
+                      ) : (
+                        <span className={`inline-flex items-center gap-0.5 font-semibold text-xs ${pctColor(row.pct)}`}>
+                          {pctIcon(row.pct)}{Math.abs(row.pct).toFixed(1)}%
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              <tr className="bg-slate-100/70 border-t-2 border-slate-300 font-bold">
                 <td className="py-2 px-3 border-r border-slate-300 text-slate-800">TOTAL</td>
-                <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.enero.toLocaleString('es-CO')}</td>
-                <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.febrero.toLocaleString('es-CO')}</td>
-                <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.marzo.toLocaleString('es-CO')}</td>
-                <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.abril.toLocaleString('es-CO')}</td>
-                <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.mayo.toLocaleString('es-CO')}</td>
-                <td className="py-2 px-2 border-r border-slate-300 text-slate-800 text-center">{colTotals.junio.toLocaleString('es-CO')}</td>
-                <td className="py-2 px-3 text-slate-800 text-center bg-slate-200/50">{colTotals.total.toLocaleString('es-CO')}</td>
+                {colTotals2026.map((v, mi) => (
+                  <td key={mi} className="py-2 px-2 text-center text-slate-800 bg-blue-100/40 border-r border-blue-100">
+                    {v.toLocaleString('es-CO')}
+                  </td>
+                ))}
+                <td className="py-2 px-3 text-center text-slate-600 border-l border-slate-300 bg-slate-100">
+                  {sumTotal2025.toLocaleString('es-CO')}
+                </td>
+                <td className="py-2 px-3 text-center text-blue-900 border-l border-blue-200 bg-blue-100/50">
+                  {sumTotal2026.toLocaleString('es-CO')}
+                </td>
+                <td className="py-2 px-3 text-center border-l border-slate-300">
+                  <span className={`inline-flex items-center gap-0.5 font-bold ${pctColor(sumPct)}`}>
+                    {pctIcon(sumPct)}{Math.abs(sumPct).toFixed(1)}%
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── MES A MES TABLE ──────────────────────────────────────────────────────────
+  const renderMesAMesTable = (
+    title: string,
+    accentColor: string,
+    data: ReturnType<typeof getMergedData>
+  ) => {
+    if (data.length === 0) return <EmptyState title={title} />;
+
+    // For each month: show 2025 | 2026 | Δ%
+    // Grand totals per month
+    const monthTotals = MONTHS.map((_, i) => ({
+      t2025: data.reduce((a, r) => a + r.monthVals2025[i], 0),
+      t2026: data.reduce((a, r) => a + r.monthVals2026[i], 0),
+    }));
+
+    const MONTH_COLORS: Record<string, { bg25: string; bg26: string; border: string; header: string }> = {
+      Enero:   { bg25: 'bg-indigo-50/40', bg26: 'bg-indigo-100/60', border: 'border-indigo-100', header: 'bg-indigo-50 text-indigo-800' },
+      Febrero: { bg25: 'bg-blue-50/40',   bg26: 'bg-blue-100/60',   border: 'border-blue-100',   header: 'bg-blue-50 text-blue-800' },
+      Marzo:   { bg25: 'bg-teal-50/40',   bg26: 'bg-teal-100/60',   border: 'border-teal-100',   header: 'bg-teal-50 text-teal-800' },
+      Abril:   { bg25: 'bg-emerald-50/40',bg26: 'bg-emerald-100/60',border: 'border-emerald-100',header: 'bg-emerald-50 text-emerald-800' },
+      Mayo:    { bg25: 'bg-amber-50/40',  bg26: 'bg-amber-100/60',  border: 'border-amber-100',  header: 'bg-amber-50 text-amber-800' },
+      Junio:   { bg25: 'bg-rose-50/40',   bg26: 'bg-rose-100/60',   border: 'border-rose-100',   header: 'bg-rose-50 text-rose-800' },
+    };
+
+    return (
+      <div className="mb-10 last:mb-0">
+        <h3 className={`text-sm font-bold mb-3 ${accentColor}`}>{title}</h3>
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              {/* Row 1: Month group headers */}
+              <tr className="border-b border-slate-200 text-center bg-slate-50">
+                <th className="py-2 px-3 text-left text-slate-600 font-semibold border-r border-slate-200" rowSpan={2}>
+                  Modalidad
+                </th>
+                {MONTHS.map(m => {
+                  const c = MONTH_COLORS[m];
+                  return (
+                    <th key={m} colSpan={3} className={`py-2 px-2 font-bold border-x border-slate-200 ${c.header}`}>
+                      {m}
+                    </th>
+                  );
+                })}
+                <th className="py-2 px-3 bg-slate-100 text-slate-700 font-bold border-l border-slate-200" rowSpan={2}>
+                  Total 2025
+                </th>
+                <th className="py-2 px-3 bg-blue-100 text-blue-900 font-bold border-l border-blue-200" rowSpan={2}>
+                  Total 2026
+                </th>
+                <th className="py-2 px-3 text-slate-600 font-bold border-l border-slate-200" rowSpan={2}>
+                  YoY
+                </th>
+              </tr>
+              {/* Row 2: Year sub-headers per month */}
+              <tr className="border-b-2 border-slate-300 text-slate-500">
+                {MONTHS.map(m => {
+                  const c = MONTH_COLORS[m];
+                  return (
+                    <React.Fragment key={m}>
+                      <th className={`py-1.5 px-2 text-center font-semibold ${c.bg25} border-l border-slate-200`}>25</th>
+                      <th className={`py-1.5 px-2 text-center font-semibold ${c.bg26}`}>26</th>
+                      <th className={`py-1.5 px-2 text-center font-semibold bg-slate-50 border-r border-slate-200`}>Δ%</th>
+                    </React.Fragment>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, idx) => {
+                const isNew = row.total2025 === 0;
+                return (
+                  <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/60 transition-colors">
+                    <td className="py-1.5 px-3 border-r border-slate-200 text-slate-700 font-medium whitespace-nowrap">
+                      {row.name}
+                    </td>
+                    {MONTHS.map((m, mi) => {
+                      const v25 = row.monthVals2025[mi];
+                      const v26 = row.monthVals2026[mi];
+                      const dp = v25 > 0 ? ((v26 - v25) / v25) * 100 : v26 > 0 ? 100 : null;
+                      const c = MONTH_COLORS[m];
+                      return (
+                        <React.Fragment key={m}>
+                          <td className={`py-1.5 px-2 text-center text-slate-500 border-l border-slate-100 ${c.bg25}`}>
+                            {fmtNum(v25)}
+                          </td>
+                          <td className={`py-1.5 px-2 text-center font-semibold text-slate-800 ${c.bg26}`}>
+                            {fmtNum(v26)}
+                          </td>
+                          <td className="py-1.5 px-2 text-center bg-slate-50 border-r border-slate-200">
+                            {dp === null ? (
+                              <span className="text-slate-300">—</span>
+                            ) : (
+                              <span className={`inline-flex items-center font-semibold ${pctColor(dp)}`}>
+                                {pctIcon(dp)}{Math.abs(dp).toFixed(0)}%
+                              </span>
+                            )}
+                          </td>
+                        </React.Fragment>
+                      );
+                    })}
+                    {/* Row totals */}
+                    <td className="py-1.5 px-3 text-center text-slate-500 border-l border-slate-200 bg-slate-50/40">
+                      {row.total2025 > 0 ? row.total2025.toLocaleString('es-CO') : <span className="text-slate-300">—</span>}
+                    </td>
+                    <td className="py-1.5 px-3 text-center font-bold text-blue-900 border-l border-blue-100 bg-blue-50/30">
+                      {row.total2026.toLocaleString('es-CO')}
+                    </td>
+                    <td className="py-1.5 px-3 text-center border-l border-slate-200">
+                      {isNew ? (
+                        <span className="text-slate-400 italic">Nuevo</span>
+                      ) : (
+                        <span className={`inline-flex items-center gap-0.5 font-bold ${pctColor(row.pct)}`}>
+                          {pctIcon(row.pct)}{Math.abs(row.pct).toFixed(1)}%
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {/* TOTAL row */}
+              <tr className="bg-slate-100/70 border-t-2 border-slate-300 font-bold">
+                <td className="py-2 px-3 border-r border-slate-300 text-slate-800">TOTAL</td>
+                {MONTHS.map((m, mi) => {
+                  const { t2025, t2026 } = monthTotals[mi];
+                  const dp = t2025 > 0 ? ((t2026 - t2025) / t2025) * 100 : 0;
+                  const c = MONTH_COLORS[m];
+                  return (
+                    <React.Fragment key={m}>
+                      <td className={`py-2 px-2 text-center text-slate-600 border-l border-slate-200 ${c.bg25}`}>
+                        {t2025.toLocaleString('es-CO')}
+                      </td>
+                      <td className={`py-2 px-2 text-center text-slate-900 ${c.bg26}`}>
+                        {t2026.toLocaleString('es-CO')}
+                      </td>
+                      <td className="py-2 px-2 text-center bg-slate-50 border-r border-slate-200">
+                        <span className={`inline-flex items-center ${pctColor(dp)}`}>
+                          {pctIcon(dp)}{Math.abs(dp).toFixed(0)}%
+                        </span>
+                      </td>
+                    </React.Fragment>
+                  );
+                })}
+                <td className="py-2 px-3 text-center text-slate-600 border-l border-slate-300 bg-slate-100">
+                  {data.reduce((a, r) => a + r.total2025, 0).toLocaleString('es-CO')}
+                </td>
+                <td className="py-2 px-3 text-center text-blue-900 border-l border-blue-200 bg-blue-100/50">
+                  {data.reduce((a, r) => a + r.total2026, 0).toLocaleString('es-CO')}
+                </td>
+                <td className="py-2 px-3 text-center border-l border-slate-300">
+                  {(() => {
+                    const t25 = data.reduce((a, r) => a + r.total2025, 0);
+                    const t26 = data.reduce((a, r) => a + r.total2026, 0);
+                    const p = t25 > 0 ? ((t26 - t25) / t25) * 100 : 0;
+                    return <span className={`inline-flex items-center gap-0.5 font-bold ${pctColor(p)}`}>{pctIcon(p)}{Math.abs(p).toFixed(1)}%</span>;
+                  })()}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -148,30 +361,103 @@ export default function ModalitiesTableModule({ selectedMunicipality, coverageSo
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      {/* ── Header ── */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-800 font-display">Comparativo de Usuarios por Modalidad (2026)</h2>
-          <p className="text-xs text-slate-400 mt-1">Tendencia mes a mes de los usuarios en Deportes y Recreación</p>
+          <h2 className="text-lg font-bold text-slate-800 font-display">
+            Comparativo de Usuarios por Modalidad: 2025 vs 2026
+          </h2>
+          <p className="text-xs text-slate-400 mt-1">
+            {viewMode === 'resumen'
+              ? 'Detalle mensual 2026 + total acumulado vs mismo período 2025'
+              : 'Comparativo mes a mes lado a lado: 2025 | 2026 | Variación %'}
+          </p>
         </div>
-        
-        {/* Filtro de Sede */}
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
-          <span className="text-xs font-semibold text-slate-500">Sede:</span>
-          <select 
-            className="bg-transparent text-sm font-bold text-slate-700 outline-none"
-            value={sedeFilter}
-            onChange={(e) => setSedeFilter(e.target.value)}
-          >
-            {availableSedes.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* ── Vista Toggle ── */}
+          <div className="flex items-center bg-slate-100 rounded-lg p-1 gap-1">
+            <button
+              onClick={() => setViewMode('resumen')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+                viewMode === 'resumen'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <Table className="h-3.5 w-3.5" />
+              Resumen
+            </button>
+            <button
+              onClick={() => setViewMode('mes_a_mes')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+                viewMode === 'mes_a_mes'
+                  ? 'bg-white text-slate-800 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <BarChart2 className="h-3.5 w-3.5" />
+              Mes a Mes
+            </button>
+          </div>
+
+          {/* ── Sede Filter ── */}
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+            <span className="text-xs font-semibold text-slate-500">Sede:</span>
+            <select
+              className="bg-transparent text-sm font-bold text-slate-700 outline-none"
+              value={sedeFilter}
+              onChange={e => setSedeFilter(e.target.value)}
+            >
+              {availableSedes.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
-      
-      {renderTable('Escuelas deportivas:', deportesData)}
-      {renderTable('Talleres y Actividades de Recreación:', talleresData)}
-      
+
+      {/* ── Legend ── */}
+      {viewMode === 'mes_a_mes' && (
+        <div className="flex items-center gap-4 mb-5 text-xs text-slate-500 bg-slate-50 rounded-lg px-4 py-2 border border-slate-200">
+          <span className="font-semibold text-slate-600">Leyenda:</span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 rounded-sm bg-slate-200"></span> Valor 2025
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="inline-block w-3 h-3 rounded-sm bg-blue-300"></span> Valor 2026
+          </span>
+          <span className="flex items-center gap-1.5">
+            <ArrowUpRight className="h-3 w-3 text-emerald-500" /> Crecimiento
+          </span>
+          <span className="flex items-center gap-1.5">
+            <ArrowDownRight className="h-3 w-3 text-rose-500" /> Decrecimiento
+          </span>
+        </div>
+      )}
+
+      {/* ── Tables ── */}
+      {viewMode === 'resumen' ? (
+        <>
+          {renderResumenTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
+          {renderResumenTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
+        </>
+      ) : (
+        <>
+          {renderMesAMesTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
+          {renderMesAMesTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Helper component ──────────────────────────────────────────────────────────
+function EmptyState({ title }: { title: string }) {
+  return (
+    <div className="mb-8">
+      <h3 className="text-sm font-semibold text-slate-700 mb-3">{title}</h3>
+      <p className="text-sm text-slate-400 italic">No hay datos reportados para esta sede.</p>
     </div>
   );
 }

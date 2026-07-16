@@ -67,7 +67,7 @@ export default function RevenuesModule({
     return {
       name: month,
       '2025': sum2025,
-      '2026': idx < 5 ? sum2026 : null // June 2026 is null in database
+      '2026': sum2026
     };
   });
 
@@ -275,17 +275,30 @@ export default function RevenuesModule({
         </div>
 
         <div className="overflow-x-auto print:overflow-visible">
-          <table className="w-full text-left text-sm border-collapse">
+          <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/75 text-slate-500 font-semibold text-xs uppercase tracking-wider">
-                <th className="py-3 px-4">Municipio / Sede</th>
-                <th className="py-3 px-4 text-right">Línea Deporte 2026</th>
-                <th className="py-3 px-4 text-right">Línea Recreación 2026</th>
-                <th className="py-3 px-4 text-right">Línea Act. Física 2026</th>
-                <th className="py-3 px-4 text-right">Línea Eventos 2026</th>
-                <th className="py-3 px-4 text-right bg-slate-100/50">Total 2025</th>
-                <th className="py-3 px-4 text-right bg-blue-50/50 text-blue-800 font-bold">Total 2026</th>
-                <th className="py-3 px-4 text-right">Crecimiento YoY</th>
+              {/* Row 1: Group headers */}
+              <tr className="border-b border-slate-200 text-center">
+                <th className="py-2 px-3 text-left text-slate-500 font-semibold uppercase tracking-wider" rowSpan={2}>Municipio / Sede</th>
+                <th colSpan={2} className="py-2 px-3 bg-blue-50 text-blue-800 font-bold border-x border-blue-200">Línea Deporte</th>
+                <th colSpan={2} className="py-2 px-3 bg-emerald-50 text-emerald-800 font-bold border-x border-emerald-200">Línea Recreación</th>
+                <th colSpan={2} className="py-2 px-3 bg-amber-50 text-amber-800 font-bold border-x border-amber-200">Línea Act. Física</th>
+                <th colSpan={2} className="py-2 px-3 bg-rose-50 text-rose-800 font-bold border-x border-rose-200">Línea Eventos</th>
+                <th colSpan={2} className="py-2 px-3 bg-slate-100 text-slate-700 font-bold border-x border-slate-200">Total Ingresos</th>
+                <th className="py-2 px-3 text-slate-500 font-semibold uppercase tracking-wider" rowSpan={2}>YoY</th>
+              </tr>
+              {/* Row 2: Year sub-headers */}
+              <tr className="border-b-2 border-slate-300 text-center text-slate-500 font-semibold uppercase tracking-wider">
+                <th className="py-2 px-3 bg-blue-50/60 border-l border-blue-200">2025</th>
+                <th className="py-2 px-3 bg-blue-100/60 text-blue-900 border-r border-blue-200">2026</th>
+                <th className="py-2 px-3 bg-emerald-50/60 border-l border-emerald-200">2025</th>
+                <th className="py-2 px-3 bg-emerald-100/60 text-emerald-900 border-r border-emerald-200">2026</th>
+                <th className="py-2 px-3 bg-amber-50/60 border-l border-amber-200">2025</th>
+                <th className="py-2 px-3 bg-amber-100/60 text-amber-900 border-r border-amber-200">2026</th>
+                <th className="py-2 px-3 bg-rose-50/60 border-l border-rose-200">2025</th>
+                <th className="py-2 px-3 bg-rose-100/60 text-rose-900 border-r border-rose-200">2026</th>
+                <th className="py-2 px-3 bg-slate-100 border-l border-slate-200">2025</th>
+                <th className="py-2 px-3 bg-slate-200 text-slate-900 border-r border-slate-200">2026</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -293,35 +306,53 @@ export default function RevenuesModule({
                 const isUp = mun.diff >= 0;
                 return (
                   <tr key={mun.name} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-3 px-4 font-semibold text-slate-900">{mun.name}</td>
-                    <td className="py-3 px-4 text-right font-mono text-slate-600">{formatCOP(mun.dep2026)}</td>
-                    <td className="py-3 px-4 text-right font-mono text-slate-600">{formatCOP(mun.r2026)}</td>
-                    <td className="py-3 px-4 text-right font-mono text-slate-600">{formatCOP(mun.act2026)}</td>
-                    <td className="py-3 px-4 text-right font-mono text-slate-600">{formatCOP(mun.eve2026)}</td>
-                    <td className="py-3 px-4 text-right font-mono bg-slate-50/50 text-slate-500">{formatCOP(mun.tot2025)}</td>
-                    <td className="py-3 px-4 text-right font-mono bg-blue-50/20 text-blue-900 font-semibold">{formatCOP(mun.tot2026)}</td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1 font-semibold">
-                        <span className={isUp ? 'text-emerald-600' : 'text-rose-600'}>
-                          {isUp ? <ArrowUpRight className="inline h-4 w-4" /> : <ArrowDownRight className="inline h-4 w-4" />}
-                          {mun.pct.toFixed(1)}%
-                        </span>
-                      </div>
+                    <td className="py-3 px-3 font-semibold text-slate-900 whitespace-nowrap">{mun.name}</td>
+                    {/* Deporte */}
+                    <td className="py-3 px-3 text-right font-mono text-slate-500 bg-blue-50/30">{formatCOP(mun.dep2025)}</td>
+                    <td className="py-3 px-3 text-right font-mono text-blue-900 font-semibold bg-blue-50/60">{formatCOP(mun.dep2026)}</td>
+                    {/* Recreación */}
+                    <td className="py-3 px-3 text-right font-mono text-slate-500 bg-emerald-50/30">{formatCOP(mun.r2025)}</td>
+                    <td className="py-3 px-3 text-right font-mono text-emerald-900 font-semibold bg-emerald-50/60">{formatCOP(mun.r2026)}</td>
+                    {/* Act. Física */}
+                    <td className="py-3 px-3 text-right font-mono text-slate-500 bg-amber-50/30">{formatCOP(mun.act2025)}</td>
+                    <td className="py-3 px-3 text-right font-mono text-amber-900 font-semibold bg-amber-50/60">{formatCOP(mun.act2026)}</td>
+                    {/* Eventos */}
+                    <td className="py-3 px-3 text-right font-mono text-slate-500 bg-rose-50/30">{formatCOP(mun.eve2025)}</td>
+                    <td className="py-3 px-3 text-right font-mono text-rose-900 font-semibold bg-rose-50/60">{formatCOP(mun.eve2026)}</td>
+                    {/* Totals */}
+                    <td className="py-3 px-3 text-right font-mono text-slate-500 bg-slate-50">{formatCOP(mun.tot2025)}</td>
+                    <td className="py-3 px-3 text-right font-mono text-slate-900 font-bold bg-slate-100">{formatCOP(mun.tot2026)}</td>
+                    {/* YoY */}
+                    <td className="py-3 px-3 text-right">
+                      <span className={`inline-flex items-center font-bold text-xs ${isUp ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {isUp ? <ArrowUpRight className="inline h-3 w-3" /> : <ArrowDownRight className="inline h-3 w-3" />}
+                        {mun.pct.toFixed(1)}%
+                      </span>
                     </td>
                   </tr>
                 );
               })}
               {/* Total Row */}
-              <tr className="bg-slate-50 font-bold border-t-2 border-slate-200">
-                <td className="py-3 px-4 text-slate-900">Total Consolidado</td>
-                <td className="py-3 px-4 text-right font-mono text-slate-900">{formatCOP(totals2026.deporte)}</td>
-                <td className="py-3 px-4 text-right font-mono text-slate-900">{formatCOP(totals2026.recreacion)}</td>
-                <td className="py-3 px-4 text-right font-mono text-slate-900">{formatCOP(totals2026.actividadFisica)}</td>
-                <td className="py-3 px-4 text-right font-mono text-slate-900">{formatCOP(totals2026.eventos)}</td>
-                <td className="py-3 px-4 text-right font-mono text-slate-500">{formatCOP(totals2025.total)}</td>
-                <td className="py-3 px-4 text-right font-mono text-blue-700 bg-blue-50/35">{formatCOP(totals2026.total)}</td>
-                <td className="py-3 px-4 text-right">
-                  <span className={`inline-flex items-center ${totals2026.total >= totals2025.total ? 'text-emerald-700' : 'text-rose-700'}`}>
+              <tr className="bg-slate-50 font-bold border-t-2 border-slate-300 text-xs">
+                <td className="py-3 px-3 text-slate-900">Total Consolidado</td>
+                {/* Deporte */}
+                <td className="py-3 px-3 text-right font-mono text-slate-600 bg-blue-50/30">{formatCOP(totals2025.deporte)}</td>
+                <td className="py-3 px-3 text-right font-mono text-blue-900 bg-blue-50/60">{formatCOP(totals2026.deporte)}</td>
+                {/* Recreación */}
+                <td className="py-3 px-3 text-right font-mono text-slate-600 bg-emerald-50/30">{formatCOP(totals2025.recreacion)}</td>
+                <td className="py-3 px-3 text-right font-mono text-emerald-900 bg-emerald-50/60">{formatCOP(totals2026.recreacion)}</td>
+                {/* Act. Física */}
+                <td className="py-3 px-3 text-right font-mono text-slate-600 bg-amber-50/30">{formatCOP(totals2025.actividadFisica)}</td>
+                <td className="py-3 px-3 text-right font-mono text-amber-900 bg-amber-50/60">{formatCOP(totals2026.actividadFisica)}</td>
+                {/* Eventos */}
+                <td className="py-3 px-3 text-right font-mono text-slate-600 bg-rose-50/30">{formatCOP(totals2025.eventos)}</td>
+                <td className="py-3 px-3 text-right font-mono text-rose-900 bg-rose-50/60">{formatCOP(totals2026.eventos)}</td>
+                {/* Totals */}
+                <td className="py-3 px-3 text-right font-mono text-slate-600 bg-slate-100">{formatCOP(totals2025.total)}</td>
+                <td className="py-3 px-3 text-right font-mono text-blue-800 bg-blue-50/50">{formatCOP(totals2026.total)}</td>
+                {/* YoY */}
+                <td className="py-3 px-3 text-right">
+                  <span className={`inline-flex items-center font-bold ${totals2026.total >= totals2025.total ? 'text-emerald-700' : 'text-rose-700'}`}>
                     {totals2026.total >= totals2025.total ? '+' : ''}
                     {(((totals2026.total - totals2025.total) / totals2025.total) * 100).toFixed(1)}%
                   </span>

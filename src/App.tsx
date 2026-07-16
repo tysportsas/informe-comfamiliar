@@ -268,7 +268,7 @@ export default function App() {
             />
           ) : (
             <>
-              <ModalitiesTableModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
+              <ModalitiesTableModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} periodOption={periodOption} />
               <ComparativeChartModule selectedMunicipality={selectedMunicipality} coverageSource={coverageSource} />
             </>
           )}
