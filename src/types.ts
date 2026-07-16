@@ -48,3 +48,5 @@ export interface ProgramModality {
 }
 
 export type CoverageSource = 'servicios_facturados' | 'informacion_super';
+
+export type ServiceCategory = 'all' | 'deporte' | 'recreacion';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { DollarSign, Users, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, AlertCircle } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, AlertCircle, Dumbbell, Palette } from 'lucide-react';
+import { ServiceCategory } from '../types';
 
 interface MetricCardsProps {
   total2025: number;
@@ -9,6 +10,7 @@ interface MetricCardsProps {
   periodLabel: string;
   hasIncompleteJune: boolean;
   showCoverageComparison?: boolean;
+  serviceCategory?: ServiceCategory;
 }
 
 export default function MetricCards({
@@ -18,7 +20,8 @@ export default function MetricCards({
   coverage2026,
   periodLabel,
   hasIncompleteJune,
-  showCoverageComparison = true
+  showCoverageComparison = true,
+  serviceCategory = 'all',
 }: MetricCardsProps) {
   
   // Format currency
@@ -91,8 +94,14 @@ export default function MetricCards({
         <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all hover:shadow-md sm:col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 font-display">Cobertura de Beneficiarios</span>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-              <Users className="h-5 w-5" />
+            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+              serviceCategory === 'deporte' ? 'bg-blue-50 text-blue-600' :
+              serviceCategory === 'recreacion' ? 'bg-violet-50 text-violet-600' :
+              'bg-emerald-50 text-emerald-600'
+            }`}>
+              {serviceCategory === 'deporte' ? <Dumbbell className="h-5 w-5" /> :
+               serviceCategory === 'recreacion' ? <Palette className="h-5 w-5" /> :
+               <Users className="h-5 w-5" />}
             </div>
           </div>
           <div className="mt-4">
@@ -100,13 +109,27 @@ export default function MetricCards({
               <h3 className="font-display text-2xl font-bold text-slate-900">{formatInt(coverage2026)}</h3>
             </div>
             
-            <div className="mt-1 flex items-center gap-1.5">
+            <div className="mt-1 flex items-center gap-1.5 flex-wrap">
               <span className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-2xs font-bold bg-slate-100 text-slate-500">
                 Total acumulado {periodLabel}
               </span>
+              {serviceCategory !== 'all' && (
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-2xs font-bold ${
+                  serviceCategory === 'deporte'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-violet-100 text-violet-700'
+                }`}>
+                  {serviceCategory === 'deporte' ? <Dumbbell className="h-2.5 w-2.5" /> : <Palette className="h-2.5 w-2.5" />}
+                  {serviceCategory === 'deporte' ? 'Solo Deporte' : 'Solo Recreación'}
+                </span>
+              )}
             </div>
           </div>
-          <div className="absolute right-0 bottom-0 h-1.5 w-full bg-emerald-500" />
+          <div className={`absolute right-0 bottom-0 h-1.5 w-full ${
+            serviceCategory === 'deporte' ? 'bg-blue-600' :
+            serviceCategory === 'recreacion' ? 'bg-violet-500' :
+            'bg-emerald-500'
+          }`} />
         </div>
 
       </div>

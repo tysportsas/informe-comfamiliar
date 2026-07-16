@@ -1,8 +1,7 @@
 import React from 'react';
-import { Calendar, Filter, MapPin } from 'lucide-react';
+import { Calendar, Filter, MapPin, Dumbbell, Palette } from 'lucide-react';
 import { MUNICIPALITIES } from '../data';
-
-import { CoverageSource } from '../types';
+import { CoverageSource, ServiceCategory } from '../types';
 
 interface ControlPanelProps {
   periodOption: 'jan_may' | 'jan_jun';
@@ -11,6 +10,8 @@ interface ControlPanelProps {
   setSelectedMunicipality: (val: string) => void;
   coverageSource: CoverageSource;
   setCoverageSource: (val: CoverageSource) => void;
+  serviceCategory: ServiceCategory;
+  setServiceCategory: (val: ServiceCategory) => void;
 }
 
 export default function ControlPanel({
@@ -19,7 +20,9 @@ export default function ControlPanel({
   selectedMunicipality,
   setSelectedMunicipality,
   coverageSource,
-  setCoverageSource
+  setCoverageSource,
+  serviceCategory,
+  setServiceCategory,
 }: ControlPanelProps) {
   return (
     <div className="space-y-4">
@@ -32,6 +35,7 @@ export default function ControlPanel({
       </div>
 
       <div className="space-y-4 rounded-xl border border-slate-150 bg-slate-50/50 p-4">
+
         {/* Period Selector */}
         <div className="space-y-1.5">
           <label className="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
@@ -82,6 +86,51 @@ export default function ControlPanel({
           </select>
         </div>
 
+        {/* Service Category Filter */}
+        <div className="space-y-1.5 pt-2 border-t border-slate-200/50">
+          <label className="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+            <Dumbbell className="h-3.5 w-3.5 text-slate-400" />
+            Servicios Facturados
+          </label>
+          <div className="flex flex-col gap-1 rounded-lg border border-slate-200 p-1 bg-white">
+            <button
+              id="filter-category-all"
+              onClick={() => setServiceCategory('all')}
+              className={`w-full rounded-md px-2.5 py-1.5 text-left text-xs font-semibold transition-all cursor-pointer ${
+                serviceCategory === 'all'
+                  ? 'bg-slate-700 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              Todos (Deporte + Recreación)
+            </button>
+            <button
+              id="filter-category-deporte"
+              onClick={() => setServiceCategory('deporte')}
+              className={`w-full rounded-md px-2.5 py-1.5 text-left text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                serviceCategory === 'deporte'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Dumbbell className="h-3 w-3 shrink-0" />
+              Solo Deporte
+            </button>
+            <button
+              id="filter-category-recreacion"
+              onClick={() => setServiceCategory('recreacion')}
+              className={`w-full rounded-md px-2.5 py-1.5 text-left text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                serviceCategory === 'recreacion'
+                  ? 'bg-violet-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Palette className="h-3 w-3 shrink-0" />
+              Solo Recreación
+            </button>
+          </div>
+        </div>
+
         {/* Coverage Source Selector */}
         <div className="space-y-1.5 pt-2 border-t border-slate-200/50">
           <label className="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wide">
@@ -111,6 +160,7 @@ export default function ControlPanel({
             </button>
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -13,20 +13,23 @@ import {
   DEFAULT_MODALITIES,
   MONTHS
 } from './data';
-import { LineAllocation, ProgramModality, CoverageSource } from './types';
+import { LineAllocation, ProgramModality, CoverageSource, ServiceCategory } from './types';
 
 // Load our pre-extracted high-fidelity JSON data directly!
 import reportData from './data/report_data.json';
 import coverageDataRaw from './data/coverage_data.json';
+import modalitiesDataRaw from './data/modalities_data.json';
 
 // Type assertion for coverageData
 const coverageData = coverageDataRaw as any;
+const modalitiesData = modalitiesDataRaw as any;
 
 export default function App() {
   // --- States ---
   const [periodOption, setPeriodOption] = useState<'jan_may' | 'jan_jun'>('jan_jun');
   const [selectedMunicipality, setSelectedMunicipality] = useState<string>('ALL');
   const [coverageSource, setCoverageSource] = useState<CoverageSource>('servicios_facturados');
+  const [serviceCategory, setServiceCategory] = useState<ServiceCategory>('all');
 
   const [lineAllocation, setLineAllocation] = useState<LineAllocation>(() => {
     const saved = localStorage.getItem('comfamiliar_line_allocation_v4');
@@ -74,25 +77,87 @@ export default function App() {
   const totalIncome2025 = calculateTotalIncome(data2025);
   const totalIncome2026 = calculateTotalIncome(data2026);
 
-  // Dynamic Base Coverage total based on selected municipality and coverageSource
-  const getBaseCoverage = (year: '2025' | '2026') => {
-    const coverageYearData = coverageData[year][coverageSource];
+  // Municipality map from selectedMunicipality (id) to modalities_data key
+  const municipalityToModalityKey: Record<string, string> = {
+    'PEREIRA': 'Pereira',
+    'DOSQUEBRADAS': 'Dosquebradas',
+    'SANTA ROSA': 'Santa Rosa',
+    'QUINCHIA': 'Quinchía',
+  };
+
+  const MONTH_KEYS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
+
+  /**
+   * Calculates beneficiary coverage from modalities_data.json
+   * summing Deporte and/or Recreación programs per municipality and period.
+   */
+  const getCoverageFromModalities = (source: CoverageSource, category: ServiceCategory): number => {
+    // informacion_super only has 'Todas' and limited data, fall back to legacy calc
+    if (source === 'informacion_super') {
+      const coverageYearData = coverageData['2026'][source];
+      let base = coverageYearData.total || 0;
+      if (coverageYearData.monthly && Array.isArray(coverageYearData.monthly)) {
+        base = coverageYearData.monthly.slice(0, monthsLimit).reduce((acc: number, curr: number) => acc + curr, 0);
+      }
+      if (selectedMunicipality === 'PEREIRA') return Math.round(base * 0.60);
+      if (selectedMunicipality === 'DOSQUEBRADAS') return Math.round(base * 0.25);
+      if (selectedMunicipality === 'SANTA ROSA') return Math.round(base * 0.10);
+      if (selectedMunicipality === 'QUINCHIA') return Math.round(base * 0.05);
+      return base;
+    }
+
+    // servicios_facturados: sum directly from modalities data
+    const sourceData = modalitiesData[source]; // { Deporte: { Pereira: {...}, ... }, Recreación: { ... } }
+    const sectorsToInclude: string[] = 
+      category === 'all' ? ['Deporte', 'Recreación'] :
+      category === 'deporte' ? ['Deporte'] : ['Recreación'];
+
+    const monthsToSum = MONTH_KEYS.slice(0, monthsLimit);
+    let total = 0;
+
+    sectorsToInclude.forEach((sector) => {
+      const sectorData = sourceData?.[sector] || {};
+      const municipalityKeys =
+        selectedMunicipality === 'ALL'
+          ? Object.keys(sectorData)
+          : [municipalityToModalityKey[selectedMunicipality]].filter(Boolean);
+
+      municipalityKeys.forEach((mun) => {
+        const munData = sectorData[mun] || {};
+        Object.values(munData).forEach((programData: any) => {
+          monthsToSum.forEach((month) => {
+            total += programData[month] || 0;
+          });
+        });
+      });
+    });
+
+    return total;
+  };
+
+  // Legacy getBaseCoverage only used for 2025 (no modalities breakdown available)
+  const getBaseCoverage2025 = () => {
+    const coverageYearData = coverageData['2025'][coverageSource];
     let base = coverageYearData.total;
-    
-    // If month-by-month data exists, sum up to monthsLimit
     if (coverageYearData.monthly && Array.isArray(coverageYearData.monthly)) {
       base = coverageYearData.monthly.slice(0, monthsLimit).reduce((acc: number, curr: number) => acc + curr, 0);
     }
-    
     if (selectedMunicipality === 'PEREIRA') return Math.round(base * 0.60);
     if (selectedMunicipality === 'DOSQUEBRADAS') return Math.round(base * 0.25);
     if (selectedMunicipality === 'SANTA ROSA') return Math.round(base * 0.10);
     if (selectedMunicipality === 'QUINCHIA') return Math.round(base * 0.05);
-    return base;
+    // Apply category proportion from 2026 data as proxy for 2025
+    return Math.round(base);
   };
 
-  const coverageTotal2025 = getBaseCoverage('2025');
-  const coverageTotal2026 = getBaseCoverage('2026');
+  const coverageTotal2026 = getCoverageFromModalities(coverageSource, serviceCategory);
+  // For 2025, use legacy since we don't have modalities breakdown. Apply category ratio from 2026.
+  const coverageTotal2025Raw = getBaseCoverage2025();
+  const coverageAll2026 = coverageSource === 'servicios_facturados'
+    ? getCoverageFromModalities('servicios_facturados', 'all')
+    : coverageTotal2026;
+  const categoryRatio = coverageAll2026 > 0 ? coverageTotal2026 / coverageAll2026 : 1;
+  const coverageTotal2025 = Math.round(coverageTotal2025Raw * categoryRatio);
 
   // Split Line totals for modality formulas
   const getLineTotals = (yearData: any) => {
@@ -202,6 +267,8 @@ export default function App() {
             setSelectedMunicipality={setSelectedMunicipality}
             coverageSource={coverageSource}
             setCoverageSource={setCoverageSource}
+            serviceCategory={serviceCategory}
+            setServiceCategory={setServiceCategory}
           />
         </div>
 
@@ -243,7 +310,9 @@ export default function App() {
             periodLabel={periodLabel}
             hasIncompleteJune={hasIncompleteJune}
             showCoverageComparison={coverageSource === 'servicios_facturados'}
+            serviceCategory={serviceCategory}
           />
+
 
           {/* Section 3: Revenue Comparative Module (Req 1 & 2) */}
           <div className="border-t border-slate-200/50 pt-2">
