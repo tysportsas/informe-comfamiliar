@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LabelList } from 'recharts';
-import { Users, Loader2, PieChart as PieChartIcon } from 'lucide-react';
+import { Users, Loader2, BarChart2, Calendar } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import modalitiesData2025Raw from '../data/modalities_data_2025.json';
 
 import { CoverageSource } from '../types';
 
@@ -10,12 +11,19 @@ interface CoverageModuleProps {
   coverageSource?: CoverageSource;
 }
 
+const CATEGORY_ALLOC = {
+  2025: { A: 45, B: 30, C: 15, D: 10 },
+  2026: { A: 51, B: 32, C: 6,  D: 11 },
+};
+
 export default function CoverageModule({ selectedMunicipality, coverageSource = 'servicios_facturados' }: CoverageModuleProps) {
   const availableSedes = ['Todas', 'Pereira', 'Dosquebradas', 'Santa Rosa', 'Quinchía'];
   
   const [sedeFilter, setSedeFilter] = useState<string>(
     selectedMunicipality === 'ALL' ? 'Todas' : selectedMunicipality
   );
+  
+  const [yearMode, setYearMode] = useState<'2025' | '2026' | 'Ambos'>('Ambos');
   
   const [categoriesData, setCategoriesData] = useState<any>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -50,28 +58,60 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
   };
 
   const chartData = useMemo(() => {
-    const dataForSede = categoriesData[sedeFilter] || categoriesData['Todas'] || {};
+    const dataForSede2026 = categoriesData[sedeFilter] || categoriesData['Todas'] || {};
     
+    // Calculate 2025 totals
+    const raw2025: any = (modalitiesData2025Raw as any)[coverageSource] || modalitiesData2025Raw;
+    const monthlyTotals25 = [0, 0, 0, 0, 0];
+    const lines = ['Deporte', 'Recreación'];
+    lines.forEach(linea => {
+      const lineaData = raw2025[linea] || {};
+      const sedesToProcess = sedeFilter === 'Todas' ? Object.keys(lineaData) : [sedeFilter];
+      sedesToProcess.forEach(sedeKey => {
+        const sedeData = lineaData[sedeKey] || {};
+        Object.values(sedeData).forEach((mod: any) => {
+          ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'].forEach((m, i) => {
+            monthlyTotals25[i] += (mod[m] || 0);
+          });
+        });
+      });
+    });
+
     // Convert to array for Recharts
     const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'];
-    return months.map(m => ({
-      name: m,
-      A: dataForSede[m]?.A || 0,
-      B: dataForSede[m]?.B || 0,
-      C: dataForSede[m]?.C || 0,
-      D: dataForSede[m]?.D || 0,
-    }));
-  }, [sedeFilter, categoriesData]);
+    return months.map((m, i) => {
+      const tot25 = monthlyTotals25[i];
+      const a25 = Math.round(tot25 * CATEGORY_ALLOC[2025].A / 100);
+      const b25 = Math.round(tot25 * CATEGORY_ALLOC[2025].B / 100);
+      const c25 = Math.round(tot25 * CATEGORY_ALLOC[2025].C / 100);
+      const d25 = tot25 > 0 ? tot25 - a25 - b25 - c25 : 0;
 
-  // Calculate totals for quick metrics
+      return {
+        name: m,
+        A_25: a25, B_25: b25, C_25: c25, D_25: d25,
+        A_26: dataForSede2026[m]?.A || 0,
+        B_26: dataForSede2026[m]?.B || 0,
+        C_26: dataForSede2026[m]?.C || 0,
+        D_26: dataForSede2026[m]?.D || 0,
+      };
+    });
+  }, [sedeFilter, categoriesData, coverageSource]);
+
+  // Calculate totals for quick metrics (shows either 2025, 2026, or combined if Ambos)
   const totals = useMemo(() => {
-    return chartData.reduce((acc, curr) => ({
-      A: acc.A + curr.A,
-      B: acc.B + curr.B,
-      C: acc.C + curr.C,
-      D: acc.D + curr.D,
-    }), { A: 0, B: 0, C: 0, D: 0 });
-  }, [chartData]);
+    return chartData.reduce((acc, curr) => {
+      const aVal = yearMode === 'Ambos' ? curr.A_25 + curr.A_26 : (yearMode === '2025' ? curr.A_25 : curr.A_26);
+      const bVal = yearMode === 'Ambos' ? curr.B_25 + curr.B_26 : (yearMode === '2025' ? curr.B_25 : curr.B_26);
+      const cVal = yearMode === 'Ambos' ? curr.C_25 + curr.C_26 : (yearMode === '2025' ? curr.C_25 : curr.C_26);
+      const dVal = yearMode === 'Ambos' ? curr.D_25 + curr.D_26 : (yearMode === '2025' ? curr.D_25 : curr.D_26);
+      return {
+        A: acc.A + aVal,
+        B: acc.B + bVal,
+        C: acc.C + cVal,
+        D: acc.D + dVal,
+      };
+    }, { A: 0, B: 0, C: 0, D: 0 });
+  }, [chartData, yearMode]);
 
   const totalUsers = totals.A + totals.B + totals.C + totals.D;
 
@@ -84,6 +124,27 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
     );
   }
 
+  // Common label component for bars
+  const renderLabel = (props: any, dataKey: string) => {
+    const { x, y, width, height, index } = props;
+    const data = chartData[index];
+    const val = data[dataKey];
+    if (!data || !val || val === 0 || height < 15) return null;
+    
+    let total = 0;
+    if (dataKey.endsWith('_25')) {
+      total = data.A_25 + data.B_25 + data.C_25 + data.D_25;
+    } else {
+      total = data.A_26 + data.B_26 + data.C_26 + data.D_26;
+    }
+    
+    return (
+      <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
+        {`${formatInt(val)} (${((val / total) * 100).toFixed(1)}%)`}
+      </text>
+    );
+  };
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm mb-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -92,23 +153,58 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
             <Users className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-800 font-display">Cobertura por Categorías (2026)</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Tendencia mensual real según base de datos</p>
+            <h2 className="text-lg font-bold text-slate-800 font-display">Cobertura por Categorías</h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {yearMode === '2026' ? 'Tendencia mensual real según base de datos (2026)' : 'Comparativo mensual estimado (2025) vs real (2026)'}
+            </p>
           </div>
         </div>
         
-        {/* Filtro de Sede */}
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
-          <span className="text-xs font-semibold text-slate-500">Sede:</span>
-          <select 
-            className="bg-transparent text-sm font-bold text-slate-700 outline-none"
-            value={sedeFilter}
-            onChange={(e) => setSedeFilter(e.target.value)}
-          >
-            {availableSedes.map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Year Toggle */}
+          <div className="flex items-center bg-slate-100 rounded-lg p-1 gap-1">
+            <button
+              onClick={() => setYearMode('2025')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+                yearMode === '2025' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <Calendar className="h-3.5 w-3.5" />
+              2025
+            </button>
+            <button
+              onClick={() => setYearMode('2026')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+                yearMode === '2026' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <Calendar className="h-3.5 w-3.5" />
+              2026
+            </button>
+            <button
+              onClick={() => setYearMode('Ambos')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+                yearMode === 'Ambos' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <BarChart2 className="h-3.5 w-3.5" />
+              Comparativo
+            </button>
+          </div>
+
+          {/* Filtro de Sede */}
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+            <span className="text-xs font-semibold text-slate-500">Sede:</span>
+            <select 
+              className="bg-transparent text-sm font-bold text-slate-700 outline-none"
+              value={sedeFilter}
+              onChange={(e) => setSedeFilter(e.target.value)}
+            >
+              {availableSedes.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -121,28 +217,28 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría A</p>
+          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría A {yearMode !== 'Ambos' && `(${yearMode})`}</p>
           <div className="text-2xl font-bold text-blue-600">{formatInt(totals.A)}</div>
           <p className="text-[10px] text-slate-400 mt-1">{((totals.A / totalUsers) * 100 || 0).toFixed(1)}% del total</p>
         </div>
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría B</p>
+          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría B {yearMode !== 'Ambos' && `(${yearMode})`}</p>
           <div className="text-2xl font-bold text-emerald-600">{formatInt(totals.B)}</div>
           <p className="text-[10px] text-slate-400 mt-1">{((totals.B / totalUsers) * 100 || 0).toFixed(1)}% del total</p>
         </div>
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría C</p>
+          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría C {yearMode !== 'Ambos' && `(${yearMode})`}</p>
           <div className="text-2xl font-bold text-amber-500">{formatInt(totals.C)}</div>
           <p className="text-[10px] text-slate-400 mt-1">{((totals.C / totalUsers) * 100 || 0).toFixed(1)}% del total</p>
         </div>
         <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría D</p>
+          <p className="text-xs text-slate-500 font-medium mb-1">Total Categoría D {yearMode !== 'Ambos' && `(${yearMode})`}</p>
           <div className="text-2xl font-bold text-rose-500">{formatInt(totals.D)}</div>
           <p className="text-[10px] text-slate-400 mt-1">{((totals.D / totalUsers) * 100 || 0).toFixed(1)}% del total</p>
         </div>
       </div>
 
-      <div className="h-[400px] w-full">
+      <div className="h-[450px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
@@ -152,113 +248,46 @@ export default function CoverageModule({ selectedMunicipality, coverageSource = 
             <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
             <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(val) => formatInt(val)} />
             <Tooltip 
-              formatter={(value: number) => [formatInt(value), 'Usuarios']}
+              formatter={(value: number, name: string) => [formatInt(value), name]}
               contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
             />
             <Legend wrapperStyle={{ paddingTop: '20px' }} />
-            <Bar dataKey="A" name="Categoría A (Subsidio Alto)" stackId="a" fill="#2563eb" radius={[0, 0, 0, 0]}>
-              <LabelList content={(props: any) => {
-                const { x, y, width, height, index } = props;
-                const data = chartData[index];
-                if (!data || data.A === 0) return null;
-                const total = data.A + data.B + data.C + data.D;
-                return (
-                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
-                    {`${formatInt(data.A)} (${((data.A / total) * 100).toFixed(1)}%)`}
-                  </text>
-                );
-              }} />
-            </Bar>
-            <Bar dataKey="B" name="Categoría B (Subsidio Medio)" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]}>
-              <LabelList content={(props: any) => {
-                const { x, y, width, height, index } = props;
-                const data = chartData[index];
-                if (!data || data.B === 0) return null;
-                const total = data.A + data.B + data.C + data.D;
-                return (
-                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
-                    {`${formatInt(data.B)} (${((data.B / total) * 100).toFixed(1)}%)`}
-                  </text>
-                );
-              }} />
-            </Bar>
-            <Bar dataKey="C" name="Categoría C (No subsidiado)" stackId="a" fill="#f59e0b" radius={[0, 0, 0, 0]}>
-              <LabelList content={(props: any) => {
-                const { x, y, width, height, index } = props;
-                const data = chartData[index];
-                if (!data || data.C === 0) return null;
-                const total = data.A + data.B + data.C + data.D;
-                return (
-                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
-                    {`${formatInt(data.C)} (${((data.C / total) * 100).toFixed(1)}%)`}
-                  </text>
-                );
-              }} />
-            </Bar>
-            <Bar dataKey="D" name="Categoría D (Particulares)" stackId="a" fill="#f43f5e" radius={[4, 4, 0, 0]}>
-              <LabelList content={(props: any) => {
-                const { x, y, width, height, index } = props;
-                const data = chartData[index];
-                if (!data || data.D === 0) return null;
-                const total = data.A + data.B + data.C + data.D;
-                return (
-                  <text x={x + width / 2} y={y + height / 2} fill="#ffffff" textAnchor="middle" dominantBaseline="middle" fontSize={11}>
-                    {`${formatInt(data.D)} (${((data.D / total) * 100).toFixed(1)}%)`}
-                  </text>
-                );
-              }} />
-            </Bar>
+            
+            {(yearMode === '2025' || yearMode === 'Ambos') && (
+              <>
+                <Bar dataKey="A_25" name="Cat A (2025)" stackId="2025" fill="#93c5fd" radius={[0, 0, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'A_25')} />
+                </Bar>
+                <Bar dataKey="B_25" name="Cat B (2025)" stackId="2025" fill="#6ee7b7" radius={[0, 0, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'B_25')} />
+                </Bar>
+                <Bar dataKey="C_25" name="Cat C (2025)" stackId="2025" fill="#fcd34d" radius={[0, 0, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'C_25')} />
+                </Bar>
+                <Bar dataKey="D_25" name="Cat D (2025)" stackId="2025" fill="#fda4af" radius={[4, 4, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'D_25')} />
+                </Bar>
+              </>
+            )}
+
+            {(yearMode === '2026' || yearMode === 'Ambos') && (
+              <>
+                <Bar dataKey="A_26" name="Cat A (2026)" stackId="2026" fill="#2563eb" radius={[0, 0, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'A_26')} />
+                </Bar>
+                <Bar dataKey="B_26" name="Cat B (2026)" stackId="2026" fill="#10b981" radius={[0, 0, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'B_26')} />
+                </Bar>
+                <Bar dataKey="C_26" name="Cat C (2026)" stackId="2026" fill="#f59e0b" radius={[0, 0, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'C_26')} />
+                </Bar>
+                <Bar dataKey="D_26" name="Cat D (2026)" stackId="2026" fill="#f43f5e" radius={[4, 4, 0, 0]}>
+                  <LabelList content={(p: any) => renderLabel(p, 'D_26')} />
+                </Bar>
+              </>
+            )}
           </BarChart>
         </ResponsiveContainer>
-      </div>
-      
-      <div className="mt-12 mb-4 border-t border-slate-200 pt-8">
-        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-6">
-          <PieChartIcon className="text-indigo-600 h-5 w-5" />
-          Total Usos por Categoría
-        </h3>
-        <div className="h-[350px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={[
-                  { name: 'Categoría A', value: totals.A },
-                  { name: 'Categoría B', value: totals.B },
-                  { name: 'Categoría C', value: totals.C },
-                  { name: 'Categoría D', value: totals.D },
-                ]}
-                cx="50%"
-                cy="50%"
-                innerRadius={70}
-                outerRadius={110}
-                paddingAngle={5}
-                dataKey="value"
-                label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, value }) => {
-                  const radius = innerRadius + (outerRadius - innerRadius) * 1.6;
-                  const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180));
-                  const y = cy + radius * Math.sin(-midAngle * (Math.PI / 180));
-                  if (value === 0) return null;
-                  return (
-                    <text x={x} y={y} fill="#64748b" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fontSize={11} fontWeight={600}>
-                      {`${formatInt(value)} (${(percent * 100).toFixed(1)}%)`}
-                    </text>
-                  );
-                }}
-                labelLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
-              >
-                <Cell fill="#2563eb" />
-                <Cell fill="#10b981" />
-                <Cell fill="#f59e0b" />
-                <Cell fill="#f43f5e" />
-              </Pie>
-              <Tooltip 
-                formatter={(value: number) => [formatInt(value), 'Usos']}
-                contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-              />
-              <Legend verticalAlign="bottom" height={36} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
       </div>
     </div>
   );
