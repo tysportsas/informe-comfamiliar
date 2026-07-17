@@ -10,6 +10,8 @@ interface ModalitiesTableModuleProps {
   selectedMunicipality: string;
   coverageSource?: CoverageSource;
   periodOption?: 'jan_may' | 'jan_jun';
+  realTotal2025?: number;
+  realTotal2026?: number;
 }
 
 const ALL_MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'] as const;
@@ -58,6 +60,8 @@ export default function ModalitiesTableModule({
   selectedMunicipality,
   coverageSource = 'servicios_facturados',
   periodOption = 'jan_jun',
+  realTotal2025 = 0,
+  realTotal2026 = 0,
 }: ModalitiesTableModuleProps) {
   const availableSedes = ['Todas', 'Pereira', 'Dosquebradas', 'Santa Rosa', 'Quinchía'];
   const [sedeFilter, setSedeFilter] = useState<string>(
@@ -399,24 +403,51 @@ export default function ModalitiesTableModule({
   };
 
   // ─── INGRESOS TABLE ────────────────────────────────────────────────────────
+  // Pre-compute estimated incomes for BOTH lines to get combined scale factor
+  const ingresosDeporte = useMemo(() =>
+    deportesData.map(r => ({
+      ...r,
+      ingEst2025: calcIngreso(r.total2025, 2025, r.name),
+      ingEst2026: calcIngreso(r.total2026, 2026, r.name),
+    })), [deportesData]);
+
+  const ingresosTalleres = useMemo(() =>
+    talleresData.map(r => ({
+      ...r,
+      ingEst2025: calcIngreso(r.total2025, 2025, r.name),
+      ingEst2026: calcIngreso(r.total2026, 2026, r.name),
+    })), [talleresData]);
+
+  const sumEstimated2025 = useMemo(() =>
+    [...ingresosDeporte, ...ingresosTalleres].reduce((s, r) => s + r.ingEst2025, 0),
+    [ingresosDeporte, ingresosTalleres]);
+
+  const sumEstimated2026 = useMemo(() =>
+    [...ingresosDeporte, ...ingresosTalleres].reduce((s, r) => s + r.ingEst2026, 0),
+    [ingresosDeporte, ingresosTalleres]);
+
+  // Scale factors: multiply each estimated income to make grand total = real total
+  const scale2025 = realTotal2025 > 0 && sumEstimated2025 > 0 ? realTotal2025 / sumEstimated2025 : 1;
+  const scale2026 = realTotal2026 > 0 && sumEstimated2026 > 0 ? realTotal2026 / sumEstimated2026 : 1;
+
   const renderIngresosTable = (
     title: string,
     accentColor: string,
-    data: ReturnType<typeof getMergedData>
+    preRows: Array<ReturnType<typeof ingresosDeporte>[number]>
   ) => {
-    if (data.length === 0) return <EmptyState title={title} />;
+    if (preRows.length === 0) return <EmptyState title={title} />;
 
     const formatCOP = (n: number) =>
       n > 0
         ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n)
         : '—';
 
-    // Compute ingreso per modality for both years
-    const rows = data.map(row => {
-      const ing2025 = calcIngreso(row.total2025, 2025, row.name);
-      const ing2026 = calcIngreso(row.total2026, 2026, row.name);
-      return { ...row, ing2025, ing2026 };
-    });
+    // Apply scale factors to each modality
+    const rows = preRows.map(row => ({
+      ...row,
+      ing2025: row.ingEst2025 * scale2025,
+      ing2026: row.ingEst2026 * scale2026,
+    }));
 
     const totalIng2025 = rows.reduce((s, r) => s + r.ing2025, 0);
     const totalIng2026 = rows.reduce((s, r) => s + r.ing2026, 0);
@@ -455,8 +486,9 @@ export default function ModalitiesTableModule({
             </thead>
             <tbody>
               {rows.map((row, idx) => {
-                const pct25 = totalIng2025 > 0 ? (row.ing2025 / totalIng2025) * 100 : 0;
-                const pct26 = totalIng2026 > 0 ? (row.ing2026 / totalIng2026) * 100 : 0;
+                // % participation calculated over the REAL total (entire deporte+talleres)
+                const pct25 = realTotal2025 > 0 ? (row.ing2025 / realTotal2025) * 100 : 0;
+                const pct26 = realTotal2026 > 0 ? (row.ing2026 / realTotal2026) * 100 : 0;
                 const diff = row.ing2026 - row.ing2025;
                 const yoy = row.ing2025 > 0 ? (diff / row.ing2025) * 100 : row.ing2026 > 0 ? 100 : 0;
                 const hasData = row.ing2025 > 0 || row.ing2026 > 0;
@@ -497,15 +529,19 @@ export default function ModalitiesTableModule({
               })}
               {/* TOTAL ROW */}
               <tr className="bg-slate-100/80 border-t-2 border-slate-300 font-bold">
-                <td className="py-2.5 px-4 border-r border-slate-300 text-slate-800">TOTAL</td>
+                <td className="py-2.5 px-4 border-r border-slate-300 text-slate-800">SUBTOTAL</td>
                 <td className="py-2.5 px-3 text-right font-mono text-slate-700 border-r border-slate-300 bg-slate-100">
                   {formatCOP(totalIng2025)}
                 </td>
-                <td className="py-2.5 px-3 text-center text-slate-600 border-r border-slate-300 bg-slate-100">100%</td>
+                <td className="py-2.5 px-3 text-center text-slate-600 border-r border-slate-300 bg-slate-100">
+                  {realTotal2025 > 0 ? `${(totalIng2025 / realTotal2025 * 100).toFixed(1)}%` : '100%'}
+                </td>
                 <td className="py-2.5 px-3 text-right font-mono text-blue-900 border-r border-blue-200 bg-blue-100/60">
                   {formatCOP(totalIng2026)}
                 </td>
-                <td className="py-2.5 px-3 text-center text-blue-800 border-r border-blue-200 bg-blue-100/40">100%</td>
+                <td className="py-2.5 px-3 text-center text-blue-800 border-r border-blue-200 bg-blue-100/40">
+                  {realTotal2026 > 0 ? `${(totalIng2026 / realTotal2026 * 100).toFixed(1)}%` : '100%'}
+                </td>
                 <td className="py-2.5 px-3 text-center">
                   <span className={`inline-flex items-center gap-0.5 font-bold ${pctColor(pctTotal)}`}>
                     {pctIcon(pctTotal)}{Math.abs(pctTotal).toFixed(1)}%
@@ -515,13 +551,14 @@ export default function ModalitiesTableModule({
             </tbody>
           </table>
         </div>
-        {/* Info note about calculation method */}
         <p className="mt-2 text-[10px] text-slate-400 italic">
-          * Ingresos estimados: Total usuarios × % cobertura por categoría (A/B/C/D) × tarifa oficial 2026. Categorías: A={CATEGORY_ALLOC[2026].A}%, B={CATEGORY_ALLOC[2026].B}%, C={CATEGORY_ALLOC[2026].C}%, D={CATEGORY_ALLOC[2026].D}% (2026) | A={CATEGORY_ALLOC[2025].A}%, B={CATEGORY_ALLOC[2025].B}%, C={CATEGORY_ALLOC[2025].C}%, D={CATEGORY_ALLOC[2025].D}% (2025)
+          * Ingresos distribuidos proporcionalmente según tarifas oficiales y cobertura por categoría (A/B/C/D). Total consolidado igual al ingreso real del sistema.
         </p>
       </div>
     );
   };
+
+
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -636,8 +673,8 @@ export default function ModalitiesTableModule({
         </>
       ) : (
         <>
-          {renderIngresosTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
-          {renderIngresosTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
+          {renderIngresosTable('🏅 Escuelas Deportivas', 'text-blue-800', ingresosDeporte)}
+          {renderIngresosTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', ingresosTalleres)}
         </>
       )}
     </div>
