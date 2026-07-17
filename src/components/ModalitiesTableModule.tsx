@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpRight, ArrowDownRight, BarChart2, Table } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, BarChart2, Table, DollarSign } from 'lucide-react';
 import { CoverageSource } from '../types';
 import modalitiesData2026Raw from '../data/modalities_data.json';
 import modalitiesData2025Raw from '../data/modalities_data_2025.json';
+import tarifasRaw from '../data/tarifas_modalidades.json';
+import modalityMappingRaw from '../data/modality_tariff_mapping.json';
 
 interface ModalitiesTableModuleProps {
   selectedMunicipality: string;
@@ -13,7 +15,44 @@ interface ModalitiesTableModuleProps {
 const ALL_MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'] as const;
 type Month = typeof ALL_MONTHS[number];
 
-type ViewMode = 'resumen' | 'mes_a_mes';
+type ViewMode = 'resumen' | 'mes_a_mes' | 'ingresos';
+
+const tarifas: Record<string, { t2025: Record<string, number>; t2026: Record<string, number> }> = tarifasRaw as any;
+const modalityMapping: Record<string, string> = modalityMappingRaw as any;
+
+// Category allocations (% of users per category)
+const CATEGORY_ALLOC = {
+  2025: { A: 45, B: 30, C: 15, D: 10 },
+  2026: { A: 51, B: 32, C: 6,  D: 11 },
+};
+
+function getTarifa(modalityName: string, year: 2025 | 2026): { A: number; B: number; C: number; D: number } {
+  const upper = modalityName.toUpperCase().trim();
+  // Try direct match first
+  let tarifaKey = upper;
+  if (!tarifas[tarifaKey]) {
+    // Try mapping
+    const mapped = modalityMapping[modalityName] || modalityMapping[upper];
+    if (mapped) {
+      tarifaKey = mapped.toUpperCase();
+    }
+  }
+  const entry = tarifas[tarifaKey];
+  if (!entry) return { A: 0, B: 0, C: 0, D: 0 };
+  const t = year === 2025 ? entry.t2025 : entry.t2026;
+  return { A: t.A || 0, B: t.B || 0, C: t.C || 0, D: t.D || 0 };
+}
+
+function calcIngreso(totalUsers: number, year: 2025 | 2026, modalityName: string): number {
+  const alloc = CATEGORY_ALLOC[year];
+  const tarifa = getTarifa(modalityName, year);
+  return (
+    (totalUsers * alloc.A / 100) * tarifa.A +
+    (totalUsers * alloc.B / 100) * tarifa.B +
+    (totalUsers * alloc.C / 100) * tarifa.C +
+    (totalUsers * alloc.D / 100) * tarifa.D
+  );
+}
 
 export default function ModalitiesTableModule({
   selectedMunicipality,
@@ -359,6 +398,131 @@ export default function ModalitiesTableModule({
     );
   };
 
+  // ─── INGRESOS TABLE ────────────────────────────────────────────────────────
+  const renderIngresosTable = (
+    title: string,
+    accentColor: string,
+    data: ReturnType<typeof getMergedData>
+  ) => {
+    if (data.length === 0) return <EmptyState title={title} />;
+
+    const formatCOP = (n: number) =>
+      n > 0
+        ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n)
+        : '—';
+
+    // Compute ingreso per modality for both years
+    const rows = data.map(row => {
+      const ing2025 = calcIngreso(row.total2025, 2025, row.name);
+      const ing2026 = calcIngreso(row.total2026, 2026, row.name);
+      return { ...row, ing2025, ing2026 };
+    });
+
+    const totalIng2025 = rows.reduce((s, r) => s + r.ing2025, 0);
+    const totalIng2026 = rows.reduce((s, r) => s + r.ing2026, 0);
+    const diffTotal = totalIng2026 - totalIng2025;
+    const pctTotal = totalIng2025 > 0 ? (diffTotal / totalIng2025) * 100 : 0;
+
+    return (
+      <div className="mb-10 last:mb-0">
+        <h3 className={`text-sm font-bold mb-3 ${accentColor}`}>{title}</h3>
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b-2 border-slate-300 text-center bg-slate-50">
+                <th className="py-2.5 px-4 text-left text-slate-600 font-semibold border-r border-slate-200">
+                  Modalidad Deportiva
+                </th>
+                {/* 2025 */}
+                <th className="py-2.5 px-3 bg-slate-100 text-slate-700 font-bold border-r border-slate-200">
+                  Ingresos 2025
+                </th>
+                <th className="py-2.5 px-3 bg-slate-100 text-slate-600 font-semibold border-r border-slate-300">
+                  % Participación
+                </th>
+                {/* 2026 */}
+                <th className="py-2.5 px-3 bg-blue-50 text-blue-900 font-bold border-r border-blue-100">
+                  Ingresos 2026
+                </th>
+                <th className="py-2.5 px-3 bg-blue-50 text-blue-700 font-semibold border-r border-blue-100">
+                  % Participación
+                </th>
+                {/* Var */}
+                <th className="py-2.5 px-3 text-slate-600 font-semibold">
+                  Var. YoY
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, idx) => {
+                const pct25 = totalIng2025 > 0 ? (row.ing2025 / totalIng2025) * 100 : 0;
+                const pct26 = totalIng2026 > 0 ? (row.ing2026 / totalIng2026) * 100 : 0;
+                const diff = row.ing2026 - row.ing2025;
+                const yoy = row.ing2025 > 0 ? (diff / row.ing2025) * 100 : row.ing2026 > 0 ? 100 : 0;
+                const hasData = row.ing2025 > 0 || row.ing2026 > 0;
+                return (
+                  <tr key={idx} className={`border-b border-slate-100 hover:bg-slate-50/60 transition-colors ${!hasData ? 'opacity-40' : ''}`}>
+                    <td className="py-2 px-4 border-r border-slate-200 text-slate-700 font-medium whitespace-nowrap">
+                      {row.name}
+                      {!hasData && <span className="ml-2 text-[10px] text-slate-400 italic">(sin tarifa)</span>}
+                    </td>
+                    {/* 2025 */}
+                    <td className="py-2 px-3 text-right font-mono text-slate-600 border-r border-slate-200 bg-slate-50/40">
+                      {formatCOP(row.ing2025)}
+                    </td>
+                    <td className="py-2 px-3 text-center text-slate-500 border-r border-slate-300 bg-slate-50/20">
+                      {row.ing2025 > 0 ? `${pct25.toFixed(1)}%` : '—'}
+                    </td>
+                    {/* 2026 */}
+                    <td className="py-2 px-3 text-right font-mono font-bold text-blue-900 border-r border-blue-100 bg-blue-50/30">
+                      {formatCOP(row.ing2026)}
+                    </td>
+                    <td className="py-2 px-3 text-center font-semibold text-blue-700 border-r border-blue-100 bg-blue-50/20">
+                      {row.ing2026 > 0 ? `${pct26.toFixed(1)}%` : '—'}
+                    </td>
+                    {/* YoY */}
+                    <td className="py-2 px-3 text-center">
+                      {row.ing2025 === 0 && row.ing2026 === 0 ? (
+                        <span className="text-slate-300 text-xs italic">—</span>
+                      ) : row.ing2025 === 0 ? (
+                        <span className="text-slate-400 text-xs italic">Nuevo</span>
+                      ) : (
+                        <span className={`inline-flex items-center gap-0.5 font-semibold text-xs ${pctColor(yoy)}`}>
+                          {pctIcon(yoy)}{Math.abs(yoy).toFixed(1)}%
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+              {/* TOTAL ROW */}
+              <tr className="bg-slate-100/80 border-t-2 border-slate-300 font-bold">
+                <td className="py-2.5 px-4 border-r border-slate-300 text-slate-800">TOTAL</td>
+                <td className="py-2.5 px-3 text-right font-mono text-slate-700 border-r border-slate-300 bg-slate-100">
+                  {formatCOP(totalIng2025)}
+                </td>
+                <td className="py-2.5 px-3 text-center text-slate-600 border-r border-slate-300 bg-slate-100">100%</td>
+                <td className="py-2.5 px-3 text-right font-mono text-blue-900 border-r border-blue-200 bg-blue-100/60">
+                  {formatCOP(totalIng2026)}
+                </td>
+                <td className="py-2.5 px-3 text-center text-blue-800 border-r border-blue-200 bg-blue-100/40">100%</td>
+                <td className="py-2.5 px-3 text-center">
+                  <span className={`inline-flex items-center gap-0.5 font-bold ${pctColor(pctTotal)}`}>
+                    {pctIcon(pctTotal)}{Math.abs(pctTotal).toFixed(1)}%
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        {/* Info note about calculation method */}
+        <p className="mt-2 text-[10px] text-slate-400 italic">
+          * Ingresos estimados: Total usuarios × % cobertura por categoría (A/B/C/D) × tarifa oficial 2026. Categorías: A={CATEGORY_ALLOC[2026].A}%, B={CATEGORY_ALLOC[2026].B}%, C={CATEGORY_ALLOC[2026].C}%, D={CATEGORY_ALLOC[2026].D}% (2026) | A={CATEGORY_ALLOC[2025].A}%, B={CATEGORY_ALLOC[2025].B}%, C={CATEGORY_ALLOC[2025].C}%, D={CATEGORY_ALLOC[2025].D}% (2025)
+        </p>
+      </div>
+    );
+  };
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
       {/* ── Header ── */}
@@ -370,7 +534,9 @@ export default function ModalitiesTableModule({
           <p className="text-xs text-slate-400 mt-1">
             {viewMode === 'resumen'
               ? 'Detalle mensual 2026 + total acumulado vs mismo período 2025'
-              : 'Comparativo mes a mes lado a lado: 2025 | 2026 | Variación %'}
+              : viewMode === 'mes_a_mes'
+              ? 'Comparativo mes a mes lado a lado: 2025 | 2026 | Variación %'
+              : 'Ingresos estimados por modalidad según tarifas 2026 y cobertura por categoría'}
           </p>
         </div>
 
@@ -398,6 +564,17 @@ export default function ModalitiesTableModule({
             >
               <BarChart2 className="h-3.5 w-3.5" />
               Mes a Mes
+            </button>
+            <button
+              onClick={() => setViewMode('ingresos')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+                viewMode === 'ingresos'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <DollarSign className="h-3.5 w-3.5" />
+              Ingresos $
             </button>
           </div>
 
@@ -436,16 +613,31 @@ export default function ModalitiesTableModule({
         </div>
       )}
 
+      {viewMode === 'ingresos' && (
+        <div className="flex items-center gap-3 mb-5 text-xs bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2.5">
+          <DollarSign className="h-4 w-4 text-emerald-600 shrink-0" />
+          <span className="text-emerald-800">
+            <strong>Método de cálculo:</strong> Total usuarios × % cobertura por categoría × tarifa oficial por categoría.
+            Categorías 2026: A={CATEGORY_ALLOC[2026].A}% · B={CATEGORY_ALLOC[2026].B}% · C={CATEGORY_ALLOC[2026].C}% · D={CATEGORY_ALLOC[2026].D}%
+          </span>
+        </div>
+      )}
+
       {/* ── Tables ── */}
       {viewMode === 'resumen' ? (
         <>
           {renderResumenTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
           {renderResumenTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
         </>
-      ) : (
+      ) : viewMode === 'mes_a_mes' ? (
         <>
           {renderMesAMesTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
           {renderMesAMesTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
+        </>
+      ) : (
+        <>
+          {renderIngresosTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
+          {renderIngresosTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
         </>
       )}
     </div>
