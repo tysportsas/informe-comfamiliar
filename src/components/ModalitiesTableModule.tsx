@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowUpRight, ArrowDownRight, BarChart2, Table, DollarSign } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, BarChart2, Table, DollarSign, Users } from 'lucide-react';
 import { CoverageSource } from '../types';
 import modalitiesData2026Raw from '../data/modalities_data.json';
 import modalitiesData2025Raw from '../data/modalities_data_2025.json';
@@ -17,7 +17,7 @@ interface ModalitiesTableModuleProps {
 const ALL_MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'] as const;
 type Month = typeof ALL_MONTHS[number];
 
-type ViewMode = 'resumen' | 'mes_a_mes' | 'ingresos';
+type ViewMode = 'resumen' | 'mes_a_mes' | 'ingresos' | 'categorias';
 
 const tarifas: Record<string, { t2025: Record<string, number>; t2026: Record<string, number> }> = tarifasRaw as any;
 const modalityMapping: Record<string, string> = modalityMappingRaw as any;
@@ -401,6 +401,116 @@ export default function ModalitiesTableModule({
       </div>
     );
   };
+  // ─── CATEGORIAS TABLE ────────────────────────────────────────────────────────
+  const renderCategoriasTable = (
+    title: string,
+    accentColor: string,
+    data: ReturnType<typeof getMergedData>
+  ) => {
+    if (data.length === 0) return <EmptyState title={title} />;
+
+    const sumTotal2025 = data.reduce((a, r) => a + r.total2025, 0);
+    const sumTotal2026 = data.reduce((a, r) => a + r.total2026, 0);
+
+    return (
+      <div className="mb-10 last:mb-0">
+        <h3 className={`text-sm font-bold mb-3 ${accentColor}`}>{title}</h3>
+        <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200 text-center bg-slate-50">
+                <th className="py-2 px-3 text-left text-slate-600 font-semibold border-r border-slate-200" rowSpan={2}>
+                  Modalidad/Categoría
+                </th>
+                <th colSpan={5} className="py-2 px-2 bg-slate-100 text-slate-700 font-bold border-r border-slate-200">
+                  2025
+                </th>
+                <th className="py-2 px-2 bg-slate-100 text-slate-600 font-bold border-r border-slate-200" rowSpan={2}>
+                  % PART.
+                </th>
+                <th colSpan={5} className="py-2 px-2 bg-blue-50 text-blue-900 font-bold border-r border-blue-100">
+                  2026
+                </th>
+                <th className="py-2 px-2 bg-blue-50 text-blue-800 font-bold border-r border-blue-100" rowSpan={2}>
+                  % PART.
+                </th>
+              </tr>
+              <tr className="border-b border-slate-300 text-slate-500 bg-slate-50">
+                {/* 2025 subcols */}
+                <th className="py-1 px-2 text-center font-semibold border-r border-slate-200">A</th>
+                <th className="py-1 px-2 text-center font-semibold border-r border-slate-200">B</th>
+                <th className="py-1 px-2 text-center font-semibold border-r border-slate-200">C</th>
+                <th className="py-1 px-2 text-center font-semibold border-r border-slate-200">D</th>
+                <th className="py-1 px-2 text-center font-bold border-r border-slate-200">Total</th>
+                {/* 2026 subcols */}
+                <th className="py-1 px-2 text-center font-semibold border-r border-blue-100 bg-blue-50/50">A</th>
+                <th className="py-1 px-2 text-center font-semibold border-r border-blue-100 bg-blue-50/50">B</th>
+                <th className="py-1 px-2 text-center font-semibold border-r border-blue-100 bg-blue-50/50">C</th>
+                <th className="py-1 px-2 text-center font-semibold border-r border-blue-100 bg-blue-50/50">D</th>
+                <th className="py-1 px-2 text-center font-bold border-r border-blue-100 bg-blue-50/50">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((row, idx) => {
+                const a25 = Math.round(row.total2025 * CATEGORY_ALLOC[2025].A / 100);
+                const b25 = Math.round(row.total2025 * CATEGORY_ALLOC[2025].B / 100);
+                const c25 = Math.round(row.total2025 * CATEGORY_ALLOC[2025].C / 100);
+                // D as remainder
+                const d25_adj = row.total2025 > 0 ? row.total2025 - a25 - b25 - c25 : 0;
+
+                const a26 = Math.round(row.total2026 * CATEGORY_ALLOC[2026].A / 100);
+                const b26 = Math.round(row.total2026 * CATEGORY_ALLOC[2026].B / 100);
+                const c26 = Math.round(row.total2026 * CATEGORY_ALLOC[2026].C / 100);
+                // D as remainder
+                const d26_adj = row.total2026 > 0 ? row.total2026 - a26 - b26 - c26 : 0;
+
+                const pct25 = sumTotal2025 > 0 ? (row.total2025 / sumTotal2025) * 100 : 0;
+                const pct26 = sumTotal2026 > 0 ? (row.total2026 / sumTotal2026) * 100 : 0;
+
+                return (
+                  <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/60 transition-colors">
+                    <td className="py-1.5 px-3 border-r border-slate-200 text-slate-700 font-medium whitespace-nowrap">{row.name}</td>
+                    {/* 2025 */}
+                    <td className="py-1.5 px-2 text-center text-slate-600 border-r border-slate-100">{a25.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center text-slate-600 border-r border-slate-100">{b25.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center text-slate-600 border-r border-slate-100">{c25.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center text-slate-600 border-r border-slate-200">{d25_adj.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center font-bold text-slate-700 border-r border-slate-200 bg-slate-50/40">{row.total2025.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center text-slate-500 border-r border-slate-200">{pct25.toFixed(1)}%</td>
+                    {/* 2026 */}
+                    <td className="py-1.5 px-2 text-center text-blue-800 border-r border-blue-50 bg-blue-50/20">{a26.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center text-blue-800 border-r border-blue-50 bg-blue-50/20">{b26.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center text-blue-800 border-r border-blue-50 bg-blue-50/20">{c26.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center text-blue-800 border-r border-blue-100 bg-blue-50/20">{d26_adj.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center font-bold text-blue-900 border-r border-blue-100 bg-blue-50/40">{row.total2026.toLocaleString('es-CO')}</td>
+                    <td className="py-1.5 px-2 text-center font-semibold text-blue-700">{pct26.toFixed(1)}%</td>
+                  </tr>
+                );
+              })}
+              {/* TOTAL ROW */}
+              <tr className="bg-slate-100/70 border-t-2 border-slate-300 font-bold">
+                <td className="py-2 px-3 border-r border-slate-300 text-slate-800">TOTAL</td>
+                <td className="py-2 px-2 text-center border-r border-slate-200">{Math.round(sumTotal2025 * CATEGORY_ALLOC[2025].A / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center border-r border-slate-200">{Math.round(sumTotal2025 * CATEGORY_ALLOC[2025].B / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center border-r border-slate-200">{Math.round(sumTotal2025 * CATEGORY_ALLOC[2025].C / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center border-r border-slate-300">{Math.round(sumTotal2025 * CATEGORY_ALLOC[2025].D / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center text-slate-800 bg-slate-200/50 border-r border-slate-300">{sumTotal2025.toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center border-r border-slate-300">100%</td>
+
+                <td className="py-2 px-2 text-center text-blue-900 border-r border-blue-200">{Math.round(sumTotal2026 * CATEGORY_ALLOC[2026].A / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center text-blue-900 border-r border-blue-200">{Math.round(sumTotal2026 * CATEGORY_ALLOC[2026].B / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center text-blue-900 border-r border-blue-200">{Math.round(sumTotal2026 * CATEGORY_ALLOC[2026].C / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center text-blue-900 border-r border-blue-200">{Math.round(sumTotal2026 * CATEGORY_ALLOC[2026].D / 100).toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center text-blue-900 bg-blue-200/50 border-r border-blue-200">{sumTotal2026.toLocaleString('es-CO')}</td>
+                <td className="py-2 px-2 text-center text-blue-900">100%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
 
   // ─── INGRESOS TABLE ────────────────────────────────────────────────────────
   // Pre-compute estimated incomes for BOTH lines to get combined scale factor
@@ -573,6 +683,8 @@ export default function ModalitiesTableModule({
               ? 'Detalle mensual 2026 + total acumulado vs mismo período 2025'
               : viewMode === 'mes_a_mes'
               ? 'Comparativo mes a mes lado a lado: 2025 | 2026 | Variación %'
+              : viewMode === 'categorias'
+              ? 'Cobertura estimada por categoría de afiliación (A-B-C-D) aplicada a cada modalidad'
               : 'Ingresos estimados por modalidad según tarifas 2026 y cobertura por categoría'}
           </p>
         </div>
@@ -601,6 +713,17 @@ export default function ModalitiesTableModule({
             >
               <BarChart2 className="h-3.5 w-3.5" />
               Mes a Mes
+            </button>
+            <button
+              onClick={() => setViewMode('categorias')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200 ${
+                viewMode === 'categorias'
+                  ? 'bg-purple-600 text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <Users className="h-3.5 w-3.5" />
+              Categorías
             </button>
             <button
               onClick={() => setViewMode('ingresos')}
@@ -650,6 +773,16 @@ export default function ModalitiesTableModule({
         </div>
       )}
 
+      {viewMode === 'categorias' && (
+        <div className="flex items-center gap-3 mb-5 text-xs bg-purple-50 border border-purple-200 rounded-lg px-4 py-2.5">
+          <Users className="h-4 w-4 text-purple-600 shrink-0" />
+          <span className="text-purple-800">
+            <strong>Desglose estimado:</strong> El número de usuarios por categoría se calcula aplicando el % de cobertura global de cada año al total de la modalidad.
+            Categorías 2026: A={CATEGORY_ALLOC[2026].A}% · B={CATEGORY_ALLOC[2026].B}% · C={CATEGORY_ALLOC[2026].C}% · D={CATEGORY_ALLOC[2026].D}%
+          </span>
+        </div>
+      )}
+
       {viewMode === 'ingresos' && (
         <div className="flex items-center gap-3 mb-5 text-xs bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2.5">
           <DollarSign className="h-4 w-4 text-emerald-600 shrink-0" />
@@ -670,6 +803,11 @@ export default function ModalitiesTableModule({
         <>
           {renderMesAMesTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
           {renderMesAMesTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
+        </>
+      ) : viewMode === 'categorias' ? (
+        <>
+          {renderCategoriasTable('🏅 Escuelas Deportivas', 'text-blue-800', deportesData)}
+          {renderCategoriasTable('🎨 Talleres y Actividades de Recreación', 'text-emerald-700', talleresData)}
         </>
       ) : (
         <>
